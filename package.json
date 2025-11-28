@@ -1,0 +1,9 @@
+{
+	"dependencies": {
+		"@vueuse/core": "^14.1.0"
+	},
+	"devDependencies": {
+		"@iconify-json/radix-icons": "^1.2.5",
+		"@iconify/vue": "^5.0.0"
+	}
+}

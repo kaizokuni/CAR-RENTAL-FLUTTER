@@ -1,0 +1,6 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/ayoublabrinssi/back-CarRental.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/ayoublabrinssi/front-CarRental.git
