@@ -1,109 +1,134 @@
-# Car Rental Management System
+# Car Rental SaaS Platform
 
-A comprehensive car rental management system with multi-tenant support, built with Go backend and Vue.js frontend.
+A modern, multi-tenant Car Rental SaaS platform built with Go (Backend) and Vue 3 (Frontend).
 
-## Project Structure
+## 🚀 Features
 
-This repository contains two submodules:
+- **Multi-Tenancy**: Subdomain-based tenant isolation with dedicated databases.
+- **Authentication**: Secure JWT-based authentication with role-based access control (RBAC).
+- **Car Fleet Management**: Manage cars, models, and availability.
+- **Bookings Management**: Create and manage customer bookings with automated price calculation.
+- **Customer Management**: Maintain customer profiles and history.
+- **Financial Management**: Track revenue, expenses, and generate invoices.
+- **Reporting & Analytics**: Visualize fleet utilization and revenue trends.
+- **Notifications**: Real-time system notifications.
+- **Security**: Rate limiting, audit logging, and secure password hashing.
 
-- **`backend/`** - Go/Gin backend API ([back-CarRental](https://github.com/ayoublabrinssi/back-CarRental))
-- **`frontend/`** - Vue.js/Vite frontend ([front-CarRental](https://github.com/ayoublabrinssi/front-CarRental))
-
-## Getting Started
-
-### Clone the Repository
-
-```bash
-git clone --recursive https://github.com/ayoublabrinssi/CarRental.git
-cd CarRental
-```
-
-If you already cloned without `--recursive`, initialize submodules:
-
-```bash
-git submodule update --init --recursive
-```
-
-### Backend Setup
-
-```bash
-cd backend
-go mod download
-go run cmd/api/main.go
-```
-
-The backend will run on `http://localhost:8080`
-
-### Frontend Setup
-
-```bash
-cd frontend
-pnpm install
-pnpm dev
-```
-
-The frontend will run on `http://localhost:5173`
-
-**Important:** Access via subdomain (e.g., `http://demo.localhost:5173`) for multi-tenancy support.
-
-## Features
-
-- Multi-tenant architecture
-- User authentication (JWT)
-- Car fleet management
-- Booking system
-- Customer management
-- Financial tracking (invoices, expenses)
-- Dark mode support
-- Responsive UI with shadcn-vue components
-
-## Technology Stack
+## 🛠️ Tech Stack
 
 ### Backend
 
-- Go 1.21+
-- Gin Web Framework
-- PostgreSQL
-- JWT Authentication
-- bcrypt for password hashing
+- **Language**: Go (Golang)
+- **Framework**: Gin Gonic
+- **Database**: PostgreSQL 15 (pgx driver)
+- **Authentication**: JWT (golang-jwt)
+- **Migrations**: Custom SQL schema management
 
 ### Frontend
 
-- Vue 3 (Composition API)
-- TypeScript
-- Vite
-- Pinia (State Management)
-- Vue Router
-- shadcn-vue (UI Components)
-- Tailwind CSS
-- Radix Vue (Headless UI)
+- **Framework**: Vue 3 (Composition API)
+- **Build Tool**: Vite
+- **State Management**: Pinia
+- **Routing**: Vue Router
+- **UI Library**: shadcn-vue (Radix Vue)
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide Vue
 
-## Development
+## 📦 Installation & Setup
 
-### Updating Submodules
+### Prerequisites
 
-```bash
-git submodule update --remote
-```
+- Go 1.21+
+- Node.js 18+
+- PostgreSQL 15+
 
-### Working on Submodules
+### Backend Setup
 
-Navigate to the submodule directory and work as normal:
+1.  Navigate to the backend directory:
 
-```bash
-cd backend
-# Make changes
-git add .
-git commit -m "Your changes"
-git push
+    ```bash
+    cd backend
+    ```
 
-# Update parent repo
-cd ..
-git add backend
-git commit -m "Update backend submodule"
-git push
-```
+2.  Install dependencies:
 
-## License
+    ```bash
+    go mod download
+    ```
+
+3.  Set up environment variables:
+    Create a `.env` file (or set system env vars) with:
+
+    ```env
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_USER=postgres
+    DB_PASSWORD=postgres
+    DB_NAME=car_rental_saas
+    JWT_SECRET=your_super_secret_key
+    ```
+
+4.  Run the server:
+    ```bash
+    go run cmd/api/main.go
+    ```
+    The server will start on `http://localhost:8080`.
+
+### Frontend Setup
+
+1.  Navigate to the frontend directory:
+
+    ```bash
+    cd frontend
+    ```
+
+2.  Install dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
+    The app will be available at `http://localhost:5173`.
+
+## 🏗️ Architecture
+
+The application follows a **multi-tenant architecture** where each tenant (car rental agency) has its own isolated database schema.
+
+- **Tenant Resolution**: Middleware identifies the tenant based on the subdomain (e.g., `tenant1.localhost`).
+- **Database Isolation**: Each tenant gets a dedicated PostgreSQL database created upon registration.
+- **Shared Kernel**: Common logic (auth, models) is shared, but data is strictly isolated.
+
+## 📝 API Documentation
+
+### Authentication
+
+- `POST /api/v1/auth/register`: Register a new user.
+- `POST /api/v1/auth/login`: Login and receive JWT.
+
+### Core Resources
+
+- `GET /api/v1/cars`: List cars.
+- `POST /api/v1/cars`: Add a car.
+- `GET /api/v1/bookings`: List bookings.
+- `POST /api/v1/bookings`: Create a booking.
+- `GET /api/v1/customers`: List customers.
+- `POST /api/v1/customers`: Add a customer.
+
+### Financials & Reports
+
+- `GET /api/v1/financials/stats`: Revenue stats.
+- `GET /api/v1/reports/utilization`: Fleet utilization.
+
+## 🛡️ Security
+
+- **Rate Limiting**: API is rate-limited to prevent abuse.
+- **Audit Logs**: Critical actions are logged for security auditing.
+- **Input Validation**: Strict validation on all API inputs.
+
+## 📄 License
 
 MIT

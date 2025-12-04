@@ -1,4 +1,4 @@
-version: "3.8"
+
 
 services:
   postgres:
@@ -24,6 +24,34 @@ services:
       - "5050:80"
     depends_on:
       - postgres
+    restart: always
+
+
+
+  backend:
+    build: ./backend
+    container_name: car_rental_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=car_rental
+      - JWT_SECRET=supersecretkey
+      - AUTO_SEED=true
+    depends_on:
+      - postgres
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: car_rental_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
     restart: always
 
 volumes:
