@@ -4,15 +4,13 @@ A modern, multi-tenant Car Rental SaaS platform built with Go (Backend) and Vue 
 
 ## 🚀 Features
 
-- **Multi-Tenancy**: Subdomain-based tenant isolation with dedicated databases.
-- **Authentication**: Secure JWT-based authentication with role-based access control (RBAC).
-- **Car Fleet Management**: Manage cars, models, and availability.
-- **Bookings Management**: Create and manage customer bookings with automated price calculation.
-- **Customer Management**: Maintain customer profiles and history.
-- **Financial Management**: Track revenue, expenses, and generate invoices.
-- **Reporting & Analytics**: Visualize fleet utilization and revenue trends.
-- **Notifications**: Real-time system notifications.
-- **Security**: Rate limiting, audit logging, and secure password hashing.
+- **Multi-Tenancy**: Complete tenant isolation with subscription tiers (Normal, Pro, Premium)
+- **Super Admin Dashboard**: Manage tenants, subscriptions, and impersonate users
+- **Fleet Management**: Full CRUD for vehicle management
+- **Authentication**: Secure JWT-based authentication with role-based access control (RBAC)
+- **Bookings Management**: Create and manage customer bookings
+- **Subscription Tiers**: Normal, Pro, and Premium plans with feature gating
+- **Security**: Rate limiting, audit logging, and secure password hashing
 
 ## 🛠️ Tech Stack
 
@@ -22,7 +20,6 @@ A modern, multi-tenant Car Rental SaaS platform built with Go (Backend) and Vue 
 - **Framework**: Gin Gonic
 - **Database**: PostgreSQL 15 (pgx driver)
 - **Authentication**: JWT (golang-jwt)
-- **Migrations**: Custom SQL schema management
 
 ### Frontend
 
@@ -32,9 +29,65 @@ A modern, multi-tenant Car Rental SaaS platform built with Go (Backend) and Vue 
 - **Routing**: Vue Router
 - **UI Library**: shadcn-vue (Radix Vue)
 - **Styling**: Tailwind CSS
-- **Icons**: Lucide Vue
 
-## 📦 Installation & Setup
+## 🐳 Quick Start with Docker (Recommended)
+
+### Prerequisites
+
+- Docker Desktop installed
+- Docker Compose installed
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/ayoublabrinssi/CarRental.git
+cd CarRental
+```
+
+### 2. Start All Services
+
+```bash
+docker-compose up -d
+```
+
+This will start:
+
+- **PostgreSQL** (port 5432)
+- **Backend API** (port 8080)
+- **Frontend** (port 5173)
+- **PgAdmin** (port 5050) - Database management UI
+
+### 3. Access the Application
+
+| Service         | URL                   | Credentials                |
+| --------------- | --------------------- | -------------------------- |
+| **Frontend**    | http://localhost:5173 | See default users below    |
+| **Backend API** | http://localhost:8080 | -                          |
+| **PgAdmin**     | http://localhost:5050 | admin@admin.com / password |
+
+### 4. Default User Accounts
+
+The system auto-seeds with these accounts:
+
+| Role            | Email                   | Password   | Description            |
+| --------------- | ----------------------- | ---------- | ---------------------- |
+| **Super Admin** | superadmin@platform.com | Secret123! | Platform administrator |
+| **Shop Owner**  | admin@ahmedcars.com     | Secret123! | Sample shop owner      |
+
+### 5. Stop Services
+
+```bash
+docker-compose down
+```
+
+### 6. Reset Everything (Clean Slate)
+
+```bash
+docker-compose down -v
+docker-compose up -d
+```
+
+## 📦 Manual Installation (Without Docker)
 
 ### Prerequisites
 
@@ -44,91 +97,148 @@ A modern, multi-tenant Car Rental SaaS platform built with Go (Backend) and Vue 
 
 ### Backend Setup
 
-1.  Navigate to the backend directory:
+1. Navigate to backend directory:
 
-    ```bash
-    cd backend
-    ```
+   ```bash
+   cd backend
+   ```
 
-2.  Install dependencies:
+2. Install dependencies:
 
-    ```bash
-    go mod download
-    ```
+   ```bash
+   go mod download
+   ```
 
-3.  Set up environment variables:
-    Create a `.env` file (or set system env vars) with:
+3. Create `.env` file:
 
-    ```env
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_USER=postgres
-    DB_PASSWORD=postgres
-    DB_NAME=car_rental_saas
-    JWT_SECRET=your_super_secret_key
-    ```
+   ```env
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_USER=postgres
+   DB_PASSWORD=postgres
+   DB_NAME=car_rental
+   JWT_SECRET=your_super_secret_key
+   AUTO_SEED=true
+   ```
 
-4.  Run the server:
-    ```bash
-    go run cmd/api/main.go
-    ```
-    The server will start on `http://localhost:8080`.
+4. Run the server:
+   ```bash
+   go run cmd/api/main.go
+   ```
 
 ### Frontend Setup
 
-1.  Navigate to the frontend directory:
+1. Navigate to frontend directory:
 
-    ```bash
-    cd frontend
-    ```
+   ```bash
+   cd frontend
+   ```
 
-2.  Install dependencies:
+2. Install dependencies:
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
-3.  Run the development server:
-    ```bash
-    npm run dev
-    ```
-    The app will be available at `http://localhost:5173`.
+3. Run development server:
+   ```bash
+   npm run dev
+   ```
 
 ## 🏗️ Architecture
 
-The application follows a **multi-tenant architecture** where each tenant (car rental agency) has its own isolated database schema.
+### Multi-Tenant System
 
-- **Tenant Resolution**: Middleware identifies the tenant based on the subdomain (e.g., `tenant1.localhost`).
-- **Database Isolation**: Each tenant gets a dedicated PostgreSQL database created upon registration.
-- **Shared Kernel**: Common logic (auth, models) is shared, but data is strictly isolated.
+- **Single Domain Dashboard**: All users access `localhost:5173`
+- **Role-Based Features**: UI adapts based on user role (Super Admin, Owner, Assistant)
+- **Tenant Isolation**: Each shop has its own database for data separation
+- **Subscription Tiers**: Features are gated based on subscription level
 
-## 📝 API Documentation
+### Key Features by Role
+
+#### Super Admin
+
+- View all tenants/shops
+- Create new tenants
+- Manage subscription tiers
+- Impersonate shop owners
+- Delete tenants
+
+#### Shop Owner (Admin)
+
+- Full access to their shop's features
+- Fleet management
+- Bookings management
+- Customer management
+- Financial reports (Pro/Premium only)
+
+#### Assistant
+
+- Limited access based on permissions
+- View-only access to most features
+
+## 📝 API Endpoints
 
 ### Authentication
 
-- `POST /api/v1/auth/register`: Register a new user.
-- `POST /api/v1/auth/login`: Login and receive JWT.
+- `POST /api/v1/auth/login` - Login and receive JWT
 
-### Core Resources
+### Protected Routes (Requires Auth + Tenant Context)
 
-- `GET /api/v1/cars`: List cars.
-- `POST /api/v1/cars`: Add a car.
-- `GET /api/v1/bookings`: List bookings.
-- `POST /api/v1/bookings`: Create a booking.
-- `GET /api/v1/customers`: List customers.
-- `POST /api/v1/customers`: Add a customer.
+- `GET /api/v1/me` - Get current user info
+- `GET /api/v1/cars` - List cars
+- `POST /api/v1/cars` - Add a car
+- `GET /api/v1/bookings` - List bookings
+- `POST /api/v1/bookings` - Create a booking
 
-### Financials & Reports
+### Super Admin Routes (Requires Super Admin Role)
 
-- `GET /api/v1/financials/stats`: Revenue stats.
-- `GET /api/v1/reports/utilization`: Fleet utilization.
+- `GET /api/v1/admin/tenants` - List all tenants
+- `POST /api/v1/admin/tenants` - Create new tenant
+- `GET /api/v1/admin/tenants/:id` - Get tenant details
+- `PATCH /api/v1/admin/tenants/:id/subscription` - Update subscription
+- `DELETE /api/v1/admin/tenants/:id` - Delete tenant
+- `POST /api/v1/admin/tenants/:id/impersonate` - Get impersonation token
+- `GET /api/v1/admin/stats` - Platform statistics
 
-## 🛡️ Security
+## 🔧 Development
 
-- **Rate Limiting**: API is rate-limited to prevent abuse.
-- **Audit Logs**: Critical actions are logged for security auditing.
-- **Input Validation**: Strict validation on all API inputs.
+### Rebuild Containers After Code Changes
+
+```bash
+docker-compose up -d --build
+```
+
+### View Logs
+
+```bash
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+```
+
+### Access Database
+
+```bash
+docker exec -it car_rental_postgres psql -U postgres -d car_rental
+```
+
+## 🛡️ Security Features
+
+- **JWT Authentication**: Secure token-based auth
+- **Password Hashing**: bcrypt for password storage
+- **Rate Limiting**: Prevent API abuse
+- **CORS Protection**: Configured for specific origins
+- **Audit Logging**: Track critical actions
+- **Role-Based Access Control**: Granular permissions
 
 ## 📄 License
 
 MIT
+
+## 🤝 Contributing
+
+Contributions welcome! Please feel free to submit a Pull Request.
