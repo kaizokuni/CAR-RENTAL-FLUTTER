@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useAuthStore } from './auth'
+import { getApiEndpoint } from '@/config/env'
 
 interface Tenant {
   id: string
@@ -25,7 +26,7 @@ export const useAdminStore = defineStore('admin', () => {
 
   const authStore = useAuthStore()
 
-  const API_URL = `http://localhost:8080/api/v1/admin`
+  const API_URL = getApiEndpoint('/api/v1/admin')
 
   async function fetchTenants() {
     isLoading.value = true

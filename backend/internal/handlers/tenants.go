@@ -5,8 +5,10 @@ import (
 	"car-rental-backend/internal/models"
 	"context"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,17 +17,41 @@ import (
 )
 
 type CreateTenantRequest struct {
-	Name          string `json:"name" binding:"required"`
-	Subdomain     string `json:"subdomain" binding:"required"`
-	AdminEmail    string `json:"admin_email" binding:"required,email"`
-	AdminPassword string `json:"admin_password" binding:"required,min=6"`
+	Name          string                `form:"name" binding:"required"`
+	Subdomain     string                `form:"subdomain" binding:"required"`
+	AdminEmail    string                `form:"admin_email" binding:"required,email"`
+	AdminPassword string                `form:"admin_password" binding:"required,min=6"`
+	Tier          string                `form:"tier" binding:"required,oneof=normal pro premium"`
+	PaymentMethod string                `form:"payment_method" binding:"required"`
+	Logo          *multipart.FileHeader `form:"logo"`
 }
 
 func CreateTenant(c *gin.Context) {
 	var req CreateTenantRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Handle Logo Upload
+	var logoURL string
+	if req.Logo != nil {
+		// Ensure uploads directory exists
+		uploadDir := "uploads/tenants"
+		if err := os.MkdirAll(uploadDir, 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
+			return
+		}
+
+		// Generate unique filename
+		filename := fmt.Sprintf("%d_%s", time.Now().Unix(), req.Logo.Filename)
+		filepath := filepath.Join(uploadDir, filename)
+
+		if err := c.SaveUploadedFile(req.Logo, filepath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save logo"})
+			return
+		}
+		logoURL = "/" + filepath
 	}
 
 	dbName := fmt.Sprintf("tenant_%s", req.Subdomain)
@@ -33,8 +59,8 @@ func CreateTenant(c *gin.Context) {
 	// 1. Create Tenant Record in Master DB
 	var tenantID string
 	err := database.DB.QueryRow(context.Background(),
-		"INSERT INTO tenants (name, subdomain, db_name) VALUES ($1, $2, $3) RETURNING id",
-		req.Name, req.Subdomain, dbName).Scan(&tenantID)
+		"INSERT INTO tenants (name, subdomain, db_name, subscription_tier, payment_method, logo_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+		req.Name, req.Subdomain, dbName, req.Tier, req.PaymentMethod, logoURL).Scan(&tenantID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tenant record: " + err.Error()})
@@ -65,7 +91,7 @@ func CreateTenant(c *gin.Context) {
 	}
 
 	// Insert Tenant Record into Tenant DB (to satisfy FK)
-	_, err = pool.Exec(context.Background(), "INSERT INTO tenants (id, name, subdomain, db_name) VALUES ($1, $2, $3, $4)", tenantID, req.Name, req.Subdomain, dbName)
+	_, err = pool.Exec(context.Background(), "INSERT INTO tenants (id, name, subdomain, db_name, subscription_tier, logo_url) VALUES ($1, $2, $3, $4, $5, $6)", tenantID, req.Name, req.Subdomain, dbName, req.Tier, logoURL)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert tenant record into tenant DB: " + err.Error()})
 		return

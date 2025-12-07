@@ -31,7 +31,7 @@ export const useBookingsStore = defineStore('bookings', () => {
     return headers
   }
 
-  const API_URL = `http://${window.location.hostname}:8080/api/v1`
+  const API_URL = 'http://localhost:8080/api/v1'
 
   async function fetchBookings() {
     isLoading.value = true

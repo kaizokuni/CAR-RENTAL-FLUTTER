@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { jwtDecode } from 'jwt-decode'
+import { getApiEndpoint } from '@/config/env'
 
 interface DecodedToken {
   sub: string
@@ -36,9 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
     fetchUser()
   }
 
-  // API Base URL - use localhost for backend
-  // The backend is always accessible at localhost:8080 regardless of frontend subdomain
-  const API_URL = `http://localhost:8080/api/v1/auth`
+  const API_URL = getApiEndpoint('/api/v1/auth')
 
   async function login(credentials: any) {
     isLoading.value = true
@@ -118,7 +117,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!token.value) return
     
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/me`, {
+      const response = await fetch(getApiEndpoint('/api/v1/me'), {
         headers: {
           'Authorization': `Bearer ${token.value}`,
           'X-Tenant-ID': 'default-tenant-id'

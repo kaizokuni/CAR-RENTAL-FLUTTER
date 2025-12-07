@@ -1,0 +1,1144 @@
+{
+  "makes": {
+    "Toyota": {
+      "logo": "/assets/carMakers/logos/toyota.png",
+      "models": {
+        "Yaris": {
+          "category": "compact",
+          "suggestedPrice": 34
+        },
+        "Yaris Cross": {
+          "category": "suv",
+          "suggestedPrice": 48
+        },
+        "Corolla": {
+          "category": "sedan",
+          "suggestedPrice": 35
+        },
+        "Corolla Sedan": {
+          "category": "sedan",
+          "suggestedPrice": 36
+        },
+        "Corolla Cross": {
+          "category": "suv",
+          "suggestedPrice": 48
+        },
+        "Camry": {
+          "category": "sedan",
+          "suggestedPrice": 45
+        },
+        "RAV4": {
+          "category": "suv",
+          "suggestedPrice": 55
+        },
+        "Highlander": {
+          "category": "suv",
+          "suggestedPrice": 65
+        },
+        "Land Cruiser Prado": {
+          "category": "suv",
+          "suggestedPrice": 80
+        },
+        "Land Cruiser 300": {
+          "category": "suv",
+          "suggestedPrice": 95
+        },
+        "Hilux": {
+          "category": "truck",
+          "suggestedPrice": 60
+        },
+        "Proace City": {
+          "category": "van",
+          "suggestedPrice": 40
+        },
+        "Proace Verso": {
+          "category": "van",
+          "suggestedPrice": 45
+        }
+      }
+    },
+    "Honda": {
+      "models": {
+        "Jazz": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Civic": {
+          "category": "sedan",
+          "suggestedPrice": 40
+        },
+        "Accord": {
+          "category": "sedan",
+          "suggestedPrice": 48
+        },
+        "HR-V": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "CR-V": {
+          "category": "suv",
+          "suggestedPrice": 52
+        }
+      }
+    },
+    "Ford": {
+      "models": {
+        "Fiesta": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Focus": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Fusion": {
+          "category": "sedan",
+          "suggestedPrice": 35
+        },
+        "Mondeo": {
+          "category": "sedan",
+          "suggestedPrice": 38
+        },
+        "Ecosport": {
+          "category": "suv",
+          "suggestedPrice": 38
+        },
+        "Kuga": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Edge": {
+          "category": "suv",
+          "suggestedPrice": 50
+        },
+        "Explorer": {
+          "category": "suv",
+          "suggestedPrice": 60
+        },
+        "Ranger": {
+          "category": "truck",
+          "suggestedPrice": 55
+        },
+        "Transit": {
+          "category": "van",
+          "suggestedPrice": 50
+        }
+      }
+    },
+    "BMW": {
+      "models": {
+        "1 Series": {
+          "category": "luxury",
+          "suggestedPrice": 70
+        },
+        "2 Series": {
+          "category": "luxury",
+          "suggestedPrice": 75
+        },
+        "3 Series": {
+          "category": "luxury",
+          "suggestedPrice": 85
+        },
+        "4 Series": {
+          "category": "luxury",
+          "suggestedPrice": 90
+        },
+        "5 Series": {
+          "category": "luxury",
+          "suggestedPrice": 95
+        },
+        "7 Series": {
+          "category": "luxury",
+          "suggestedPrice": 120
+        },
+        "X1": {
+          "category": "luxury-suv",
+          "suggestedPrice": 90
+        },
+        "X2": {
+          "category": "luxury-suv",
+          "suggestedPrice": 92
+        },
+        "X3": {
+          "category": "luxury-suv",
+          "suggestedPrice": 100
+        },
+        "X4": {
+          "category": "luxury-suv",
+          "suggestedPrice": 105
+        },
+        "X5": {
+          "category": "luxury-suv",
+          "suggestedPrice": 110
+        },
+        "X6": {
+          "category": "luxury-suv",
+          "suggestedPrice": 120
+        },
+        "X7": {
+          "category": "luxury-suv",
+          "suggestedPrice": 130
+        }
+      }
+    },
+    "Mercedes-Benz": {
+      "models": {
+        "A-Class": {
+          "category": "luxury",
+          "suggestedPrice": 75
+        },
+        "B-Class": {
+          "category": "luxury",
+          "suggestedPrice": 78
+        },
+        "C-Class": {
+          "category": "luxury",
+          "suggestedPrice": 90
+        },
+        "E-Class": {
+          "category": "luxury",
+          "suggestedPrice": 100
+        },
+        "S-Class": {
+          "category": "luxury",
+          "suggestedPrice": 130
+        },
+        "CLA": {
+          "category": "luxury",
+          "suggestedPrice": 85
+        },
+        "GLA": {
+          "category": "luxury-suv",
+          "suggestedPrice": 90
+        },
+        "GLB": {
+          "category": "luxury-suv",
+          "suggestedPrice": 95
+        },
+        "GLC": {
+          "category": "luxury-suv",
+          "suggestedPrice": 105
+        },
+        "GLE": {
+          "category": "luxury-suv",
+          "suggestedPrice": 110
+        },
+        "GLS": {
+          "category": "luxury-suv",
+          "suggestedPrice": 130
+        },
+        "Vito": {
+          "category": "van",
+          "suggestedPrice": 70
+        },
+        "Sprinter": {
+          "category": "truck",
+          "suggestedPrice": 80
+        }
+      }
+    },
+    "Hyundai": {
+      "logo": "/assets/carMakers/logos/hyundai.png",
+      "models": {
+        "i10": {
+          "category": "compact",
+          "suggestedPrice": 28
+        },
+        "i20": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "i30": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Accent": {
+          "category": "sedan",
+          "suggestedPrice": 30
+        },
+        "Elantra": {
+          "category": "sedan",
+          "suggestedPrice": 32
+        },
+        "Sonata": {
+          "category": "sedan",
+          "suggestedPrice": 40
+        },
+        "Venue": {
+          "category": "suv",
+          "suggestedPrice": 38
+        },
+        "Creta": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Kona": {
+          "category": "suv",
+          "suggestedPrice": 42
+        },
+        "Tucson": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Santa Fe": {
+          "category": "suv",
+          "suggestedPrice": 50
+        },
+        "Staria": {
+          "category": "van",
+          "suggestedPrice": 55
+        }
+      }
+    },
+    "Kia": {
+      "models": {
+        "Picanto": {
+          "category": "compact",
+          "suggestedPrice": 28
+        },
+        "Rio": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Cerato": {
+          "category": "sedan",
+          "suggestedPrice": 33
+        },
+        "Optima": {
+          "category": "sedan",
+          "suggestedPrice": 35
+        },
+        "K3": {
+          "category": "sedan",
+          "suggestedPrice": 34
+        },
+        "Seltos": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Sonet": {
+          "category": "suv",
+          "suggestedPrice": 42
+        },
+        "Sportage": {
+          "category": "suv",
+          "suggestedPrice": 42
+        },
+        "Sorento": {
+          "category": "suv",
+          "suggestedPrice": 48
+        },
+        "Telluride": {
+          "category": "suv",
+          "suggestedPrice": 60
+        },
+        "Carnival": {
+          "category": "van",
+          "suggestedPrice": 50
+        }
+      }
+    },
+    "Fiat": {
+      "models": {
+        "Panda": {
+          "category": "compact",
+          "suggestedPrice": 27
+        },
+        "500": {
+          "category": "compact",
+          "suggestedPrice": 29
+        },
+        "500e": {
+          "category": "compact",
+          "suggestedPrice": 35
+        },
+        "Tipo": {
+          "category": "sedan",
+          "suggestedPrice": 30
+        },
+        "Tipo Hatchback": {
+          "category": "compact",
+          "suggestedPrice": 31
+        },
+        "Doblo": {
+          "category": "van",
+          "suggestedPrice": 35
+        },
+        "Fiorino": {
+          "category": "van",
+          "suggestedPrice": 33
+        },
+        "Talento": {
+          "category": "van",
+          "suggestedPrice": 40
+        },
+        "Topolino": {
+          "category": "compact",
+          "suggestedPrice": 22
+        }
+      }
+    },
+    "Skoda": {
+      "models": {
+        "Fabia": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Scala": {
+          "category": "compact",
+          "suggestedPrice": 34
+        },
+        "Octavia": {
+          "category": "sedan",
+          "suggestedPrice": 38
+        },
+        "Octavia Combi": {
+          "category": "compact",
+          "suggestedPrice": 39
+        },
+        "Superb": {
+          "category": "sedan",
+          "suggestedPrice": 45
+        },
+        "Kamiq": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Karoq": {
+          "category": "suv",
+          "suggestedPrice": 47
+        },
+        "Kodiaq": {
+          "category": "suv",
+          "suggestedPrice": 50
+        }
+      }
+    },
+    "Nissan": {
+      "models": {
+        "Micra": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Sunny": {
+          "category": "sedan",
+          "suggestedPrice": 30
+        },
+        "Sentra": {
+          "category": "sedan",
+          "suggestedPrice": 34
+        },
+        "Altima": {
+          "category": "sedan",
+          "suggestedPrice": 38
+        },
+        "Maxima": {
+          "category": "sedan",
+          "suggestedPrice": 44
+        },
+        "Qashqai": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "X-Trail": {
+          "category": "suv",
+          "suggestedPrice": 48
+        },
+        "Juke": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Navara": {
+          "category": "truck",
+          "suggestedPrice": 55
+        },
+        "Patrol": {
+          "category": "suv",
+          "suggestedPrice": 80
+        }
+      }
+    },
+    "Opel": {
+      "models": {
+        "Corsa": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Astra": {
+          "category": "compact",
+          "suggestedPrice": 34
+        },
+        "Astra Berline": {
+          "category": "sedan",
+          "suggestedPrice": 35
+        },
+        "Mokka": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Crossland": {
+          "category": "suv",
+          "suggestedPrice": 38
+        },
+        "Grandland": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Combo": {
+          "category": "van",
+          "suggestedPrice": 35
+        },
+        "Vivaro": {
+          "category": "van",
+          "suggestedPrice": 45
+        },
+        "Movano": {
+          "category": "truck",
+          "suggestedPrice": 55
+        }
+      }
+    },
+    "Suzuki": {
+      "models": {
+        "Celerio": {
+          "category": "compact",
+          "suggestedPrice": 26
+        },
+        "Swift": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Baleno": {
+          "category": "compact",
+          "suggestedPrice": 31
+        },
+        "Dzire": {
+          "category": "sedan",
+          "suggestedPrice": 30
+        },
+        "Vitara": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "S-Cross": {
+          "category": "suv",
+          "suggestedPrice": 42
+        },
+        "Jimny": {
+          "category": "suv",
+          "suggestedPrice": 38
+        },
+        "Ertiga": {
+          "category": "van",
+          "suggestedPrice": 38
+        }
+      }
+    },
+    "Mazda": {
+      "models": {
+        "Mazda2": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Mazda3": {
+          "category": "compact",
+          "suggestedPrice": 36
+        },
+        "Mazda6": {
+          "category": "sedan",
+          "suggestedPrice": 42
+        },
+        "CX-3": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "CX-30": {
+          "category": "suv",
+          "suggestedPrice": 42
+        },
+        "CX-5": {
+          "category": "suv",
+          "suggestedPrice": 48
+        }
+      }
+    },
+    "Volkswagen": {
+      "models": {
+        "Polo": {
+          "category": "compact",
+          "suggestedPrice": 33
+        },
+        "Golf": {
+          "category": "compact",
+          "suggestedPrice": 38
+        },
+        "Golf 8": {
+          "category": "compact",
+          "suggestedPrice": 39
+        },
+        "Jetta": {
+          "category": "sedan",
+          "suggestedPrice": 37
+        },
+        "Passat": {
+          "category": "sedan",
+          "suggestedPrice": 42
+        },
+        "Arteon": {
+          "category": "sedan",
+          "suggestedPrice": 50
+        },
+        "Tiguan": {
+          "category": "suv",
+          "suggestedPrice": 47
+        },
+        "T-Roc": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Touareg": {
+          "category": "suv",
+          "suggestedPrice": 65
+        },
+        "Taigo": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "ID.3": {
+          "category": "compact",
+          "suggestedPrice": 48
+        },
+        "ID.4": {
+          "category": "suv",
+          "suggestedPrice": 55
+        },
+        "ID.5": {
+          "category": "suv",
+          "suggestedPrice": 58
+        },
+        "Touran": {
+          "category": "van",
+          "suggestedPrice": 45
+        },
+        "Sharan": {
+          "category": "van",
+          "suggestedPrice": 46
+        },
+        "Caddy": {
+          "category": "van",
+          "suggestedPrice": 40
+        },
+        "Caddy 5": {
+          "category": "van",
+          "suggestedPrice": 41
+        },
+        "Transporter": {
+          "category": "van",
+          "suggestedPrice": 48
+        },
+        "Caravelle": {
+          "category": "van",
+          "suggestedPrice": 52
+        },
+        "Multivan": {
+          "category": "van",
+          "suggestedPrice": 55
+        },
+        "Crafter": {
+          "category": "truck",
+          "suggestedPrice": 60
+        },
+        "Amarok": {
+          "category": "truck",
+          "suggestedPrice": 65
+        }
+      }
+    },
+    "Dacia": {
+      "models": {
+        "Logan": {
+          "category": "sedan",
+          "suggestedPrice": 28
+        },
+        "Sandero": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Sandero Stepway": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Sandero Streetway": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Duster": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Jogger": {
+          "category": "suv",
+          "suggestedPrice": 42
+        },
+        "Spring": {
+          "category": "compact",
+          "suggestedPrice": 35
+        },
+        "Dokker": {
+          "category": "van",
+          "suggestedPrice": 38
+        }
+      }
+    },
+    "Renault": {
+      "models": {
+        "Clio": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Clio E-Tech": {
+          "category": "compact",
+          "suggestedPrice": 38
+        },
+        "Megane": {
+          "category": "sedan",
+          "suggestedPrice": 38
+        },
+        "Megane Sedan": {
+          "category": "sedan",
+          "suggestedPrice": 38
+        },
+        "Megane E-Tech": {
+          "category": "compact",
+          "suggestedPrice": 55
+        },
+        "Captur": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Kadjar": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Austral": {
+          "category": "suv",
+          "suggestedPrice": 50
+        },
+        "Arkana": {
+          "category": "suv",
+          "suggestedPrice": 48
+        },
+        "Kardian": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Express": {
+          "category": "van",
+          "suggestedPrice": 38
+        },
+        "Kangoo": {
+          "category": "van",
+          "suggestedPrice": 39
+        },
+        "Trafic": {
+          "category": "van",
+          "suggestedPrice": 55
+        },
+        "Master": {
+          "category": "truck",
+          "suggestedPrice": 60
+        }
+      }
+    },
+    "Peugeot": {
+      "models": {
+        "208": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "e-208": {
+          "category": "compact",
+          "suggestedPrice": 40
+        },
+        "2008": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "e-2008": {
+          "category": "suv",
+          "suggestedPrice": 50
+        },
+        "301": {
+          "category": "sedan",
+          "suggestedPrice": 30
+        },
+        "308": {
+          "category": "compact",
+          "suggestedPrice": 36
+        },
+        "308 SW": {
+          "category": "compact",
+          "suggestedPrice": 38
+        },
+        "3008": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "5008": {
+          "category": "suv",
+          "suggestedPrice": 50
+        },
+        "408": {
+          "category": "sedan",
+          "suggestedPrice": 40
+        },
+        "Partner": {
+          "category": "van",
+          "suggestedPrice": 38
+        },
+        "Rifter": {
+          "category": "van",
+          "suggestedPrice": 40
+        },
+        "Landtrek": {
+          "category": "truck",
+          "suggestedPrice": 48
+        }
+      }
+    },
+    "Citroën": {
+      "models": {
+        "C-Elysée": {
+          "category": "sedan",
+          "suggestedPrice": 30
+        },
+        "C3": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "C3 Aircross": {
+          "category": "suv",
+          "suggestedPrice": 37
+        },
+        "C4": {
+          "category": "compact",
+          "suggestedPrice": 35
+        },
+        "ë-C4": {
+          "category": "compact",
+          "suggestedPrice": 42
+        },
+        "C4 Cactus": {
+          "category": "suv",
+          "suggestedPrice": 38
+        },
+        "C5 Aircross": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Berlingo": {
+          "category": "van",
+          "suggestedPrice": 38
+        },
+        "Jumpy": {
+          "category": "van",
+          "suggestedPrice": 45
+        },
+        "Jumper": {
+          "category": "truck",
+          "suggestedPrice": 55
+        },
+        "Ami": {
+          "category": "compact",
+          "suggestedPrice": 20
+        }
+      }
+    },
+    "Audi": {
+      "models": {
+        "A1": {
+          "category": "luxury",
+          "suggestedPrice": 70
+        },
+        "A3": {
+          "category": "luxury",
+          "suggestedPrice": 75
+        },
+        "A4": {
+          "category": "luxury",
+          "suggestedPrice": 85
+        },
+        "A5": {
+          "category": "luxury",
+          "suggestedPrice": 90
+        },
+        "A6": {
+          "category": "luxury",
+          "suggestedPrice": 100
+        },
+        "A7": {
+          "category": "luxury",
+          "suggestedPrice": 120
+        },
+        "Q2": {
+          "category": "luxury-suv",
+          "suggestedPrice": 80
+        },
+        "Q3": {
+          "category": "luxury-suv",
+          "suggestedPrice": 90
+        },
+        "Q5": {
+          "category": "luxury-suv",
+          "suggestedPrice": 105
+        },
+        "Q7": {
+          "category": "luxury-suv",
+          "suggestedPrice": 125
+        },
+        "Q8": {
+          "category": "luxury-suv",
+          "suggestedPrice": 135
+        }
+      }
+    },
+    "MG": {
+      "models": {
+        "ZS": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "ZS EV": {
+          "category": "suv",
+          "suggestedPrice": 48
+        },
+        "HS": {
+          "category": "suv",
+          "suggestedPrice": 50
+        },
+        "MG 4": {
+          "category": "compact",
+          "suggestedPrice": 45
+        }
+      }
+    },
+    "BYD": {
+      "models": {
+        "Atto 3": {
+          "category": "suv",
+          "suggestedPrice": 70
+        },
+        "Yuan Plus": {
+          "category": "suv",
+          "suggestedPrice": 65
+        },
+        "Dolphin": {
+          "category": "compact",
+          "suggestedPrice": 40
+        },
+        "Seal": {
+          "category": "sedan",
+          "suggestedPrice": 75
+        }
+      }
+    },
+    "Jeep": {
+      "models": {
+        "Renegade": {
+          "category": "suv",
+          "suggestedPrice": 55
+        },
+        "Compass": {
+          "category": "suv",
+          "suggestedPrice": 60
+        },
+        "Cherokee": {
+          "category": "suv",
+          "suggestedPrice": 70
+        },
+        "Grand Cherokee": {
+          "category": "suv",
+          "suggestedPrice": 85
+        },
+        "Wrangler": {
+          "category": "suv",
+          "suggestedPrice": 90
+        },
+        "Gladiator": {
+          "category": "truck",
+          "suggestedPrice": 80
+        }
+      }
+    },
+    "Land Rover": {
+      "models": {
+        "Range Rover Evoque": {
+          "category": "luxury-suv",
+          "suggestedPrice": 110
+        },
+        "Range Rover Velar": {
+          "category": "luxury-suv",
+          "suggestedPrice": 130
+        },
+        "Range Rover Sport": {
+          "category": "luxury-suv",
+          "suggestedPrice": 150
+        },
+        "Range Rover": {
+          "category": "luxury-suv",
+          "suggestedPrice": 180
+        },
+        "Discovery Sport": {
+          "category": "luxury-suv",
+          "suggestedPrice": 120
+        },
+        "Discovery": {
+          "category": "luxury-suv",
+          "suggestedPrice": 140
+        },
+        "Defender": {
+          "category": "luxury-suv",
+          "suggestedPrice": 160
+        }
+      }
+    },
+    "Volvo": {
+      "models": {
+        "XC40": {
+          "category": "luxury-suv",
+          "suggestedPrice": 95
+        },
+        "XC60": {
+          "category": "luxury-suv",
+          "suggestedPrice": 110
+        },
+        "XC90": {
+          "category": "luxury-suv",
+          "suggestedPrice": 130
+        },
+        "S60": {
+          "category": "luxury",
+          "suggestedPrice": 100
+        },
+        "S90": {
+          "category": "luxury",
+          "suggestedPrice": 120
+        }
+      }
+    },
+    "Alfa Romeo": {
+      "models": {
+        "Giulietta": {
+          "category": "luxury",
+          "suggestedPrice": 80
+        },
+        "Giulia": {
+          "category": "luxury",
+          "suggestedPrice": 95
+        },
+        "Stelvio": {
+          "category": "luxury-suv",
+          "suggestedPrice": 110
+        },
+        "Tonale": {
+          "category": "luxury-suv",
+          "suggestedPrice": 100
+        }
+      }
+    },
+    "Chery": {
+      "models": {
+        "Tiggo 2": {
+          "category": "suv",
+          "suggestedPrice": 35
+        },
+        "Tiggo 4": {
+          "category": "suv",
+          "suggestedPrice": 40
+        },
+        "Tiggo 7": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Tiggo 8": {
+          "category": "suv",
+          "suggestedPrice": 50
+        },
+        "Arrizo 5": {
+          "category": "sedan",
+          "suggestedPrice": 32
+        }
+      }
+    },
+    "DS": {
+      "models": {
+        "DS 3": {
+          "category": "luxury",
+          "suggestedPrice": 80
+        },
+        "DS 4": {
+          "category": "luxury",
+          "suggestedPrice": 90
+        },
+        "DS 7": {
+          "category": "luxury-suv",
+          "suggestedPrice": 110
+        }
+      }
+    },
+    "Chevrolet": {
+      "models": {
+        "Spark": {
+          "category": "compact",
+          "suggestedPrice": 28
+        },
+        "Aveo": {
+          "category": "compact",
+          "suggestedPrice": 30
+        },
+        "Cruze": {
+          "category": "sedan",
+          "suggestedPrice": 34
+        },
+        "Malibu": {
+          "category": "sedan",
+          "suggestedPrice": 36
+        },
+        "Onix": {
+          "category": "compact",
+          "suggestedPrice": 32
+        },
+        "Trailblazer": {
+          "category": "suv",
+          "suggestedPrice": 45
+        },
+        "Equinox": {
+          "category": "suv",
+          "suggestedPrice": 44
+        },
+        "Traverse": {
+          "category": "suv",
+          "suggestedPrice": 55
+        },
+        "Tahoe": {
+          "category": "suv",
+          "suggestedPrice": 68
+        },
+        "Silverado": {
+          "category": "truck",
+          "suggestedPrice": 70
+        }
+      }
+    }
+  },
+  "categories": [
+    "sedan",
+    "suv",
+    "compact",
+    "luxury",
+    "luxury-suv",
+    "sports",
+    "truck",
+    "van"
+  ]
+}

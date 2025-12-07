@@ -1,4 +1,5 @@
 # Car Rental SaaS Platform - Development Roadmap
+
 ## Tech Stack: Go + Vue.js + Self-Hosted
 
 ## Executive Summary
@@ -10,6 +11,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ## Technology Stack Specifications
 
 ### Frontend Stack
+
 - **Framework:** Vue.js 3 (Composition API)
 - **State Management:** Pinia
 - **Routing:** Vue Router 4
@@ -19,6 +21,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 - **Date Management:** Day.js
 
 ### Backend Stack
+
 - **Language:** Go 1.21+
 - **Framework:** Gin Gonic or Echo
 - **Authentication:** JWT (golang-jwt)
@@ -29,12 +32,14 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 - **Testing:** Testify, GoConvey
 
 ### Database
+
 - **Primary:** PostgreSQL 15+
 - **Per Tenant:** Separate database instance per client
 - **Backup:** Automated daily backups, stored on self-hosted NAS/backup server
 - **Replication:** Optional PostgreSQL streaming replication for HA
 
 ### Infrastructure (Self-Hosted)
+
 - **Server OS:** Ubuntu 22.04 LTS or Debian 12
 - **Containerization:** Docker + Docker Compose
 - **Reverse Proxy:** Nginx
@@ -50,6 +55,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ## Hardware Requirements (Self-Hosted)
 
 ### Minimum Setup (MVP)
+
 - **CPU:** 4 cores
 - **RAM:** 8GB minimum (16GB recommended)
 - **Storage:** 500GB SSD (OS + Docker + Databases)
@@ -57,9 +63,10 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 - **Backup:** External drive or NAS (1-2TB)
 
 ### Recommended Production Setup
+
 - **CPU:** 8-16 cores
 - **RAM:** 32GB
-- **Storage:** 
+- **Storage:**
   - 500GB NVMe SSD (system/apps)
   - 2TB HDD RAID array (database backups)
 - **Redundancy:** Secondary server for failover
@@ -73,6 +80,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 1.1 Server & Environment Setup
 
 **Deliverables:**
+
 - Procure/Setup physical or virtual server (Ubuntu 22.04 LTS)
 - Configure network (static IP, DNS records)
 - SSL/TLS certificate setup (Let's Encrypt)
@@ -82,6 +90,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 1.2 Docker & Containerization
 
 **Deliverables:**
+
 - Install Docker and Docker Compose
 - Create Docker network for multi-container setup
 - Setup docker-compose.yml for orchestration
@@ -91,6 +100,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 1.3 Nginx Reverse Proxy
 
 **Deliverables:**
+
 - Install and configure Nginx
 - Setup virtual hosts for subdomain routing
 - SSL/TLS termination configuration
@@ -100,6 +110,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 1.4 PostgreSQL Setup
 
 **Deliverables:**
+
 - Install PostgreSQL 15 in Docker container
 - Master database for tenant metadata
 - Backup script (daily automated backups)
@@ -109,6 +120,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 1.5 Go Backend Infrastructure
 
 **Deliverables:**
+
 - Go development environment setup
 - Gin/Echo project structure scaffolding
 - Module initialization (go.mod management)
@@ -118,6 +130,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 1.6 Vue.js Frontend Setup
 
 **Deliverables:**
+
 - Vite + Vue.js 3 project scaffolding
 - Tailwind CSS configuration
 - Component library structure
@@ -131,6 +144,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 2.1 Multi-Tenant Architecture & Authentication
 
 **Features:**
+
 - Tenant identification from subdomain
 - Master database for tenant metadata
 - JWT token generation and validation
@@ -139,6 +153,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 - Tenant context injection in all requests
 
 **Go Implementation:**
+
 - `TenantMiddleware` - Extracts tenant from request host
 - `AuthMiddleware` - Validates JWT tokens
 - `RBACMiddleware` - Checks permissions
@@ -147,12 +162,14 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 2.2 Tenant Provisioning API
 
 **Endpoints: with api versioning**
+
 - `POST /api/v1/admin/tenants` - Create new tenant
 - `GET /api/admin/tenants/{id}` - Get tenant info
 - `PUT /api/admin/tenants/{id}` - Update tenant
 - `DELETE /api/admin/tenants/{id}` - Delete tenant
 
 **Actions on tenant creation:**
+
 - Create new PostgreSQL database
 - Initialize schema
 - Create admin user
@@ -162,6 +179,7 @@ This roadmap outlines the development of a **multi-tenant SaaS car rental manage
 ### 2.3 Core API Endpoints Structure
 
 **Go Handlers Pattern:**
+
 ```
 handlers/
 ├── auth.go (login, register, refresh token)
@@ -176,11 +194,13 @@ handlers/
 ### 2.4 Database Design
 
 **Tenant Management (Master DB):**
+
 - `tenants` - Tenant info, subdomain, db_connection_string
 - `users` - Global users (if needed)
 - `billing` - Subscription and payment info
 
 **Per-Tenant DB Schema:**
+
 - `users` - Tenant employees/admins
 - `roles` - Admin, Manager, Staff
 - `permissions` - Feature-level permissions
@@ -197,12 +217,14 @@ handlers/
 ### 3.1 Theme Management Backend (Go)
 
 **Endpoints:**
+
 - `GET /api/theme` - Get current theme
 - `PUT /api/theme` - Update theme colors/branding
 - `GET /api/theme/preview` - Preview changes
 - `POST /api/theme/reset` - Reset to default
 
 **Theme Data Structure (PostgreSQL):**
+
 ```sql
 CREATE TABLE themes (
   id UUID PRIMARY KEY,
@@ -222,12 +244,14 @@ CREATE TABLE themes (
 ### 3.2 Theme Management Frontend (Vue.js)
 
 **Components:**
+
 - `ThemeBuilder.vue` - Main theme editor
 - `ColorPicker.vue` - Color selection component
 - `PreviewPanel.vue` - Live preview
 - `ThemeTemplates.vue` - Pre-built theme templates
 
 **Features:**
+
 - Drag-and-drop color picker
 - Real-time preview
 - Accessibility contrast checker
@@ -237,6 +261,7 @@ CREATE TABLE themes (
 ### 3.3 Theme Application
 
 **Implementation:**
+
 - CSS variable injection in Vue.js
 - Theme colors applied to all components
 - Landing page respects tenant theme
@@ -250,12 +275,14 @@ CREATE TABLE themes (
 ### 4.1 Landing Page Builder Backend (Go)
 
 **Endpoints:**
+
 - `GET /api/landing-page` - Get current page structure
 - `PUT /api/landing-page` - Save page structure
 - `POST /api/landing-page/publish` - Publish to live
 - `GET /api/landing-page/versions` - Get version history
 
 **Database Table:**
+
 ```sql
 CREATE TABLE landing_pages (
   id UUID PRIMARY KEY,
@@ -272,6 +299,7 @@ CREATE TABLE landing_pages (
 ### 4.2 Page Builder Frontend (Vue.js)
 
 **Components:**
+
 - `PageBuilder.vue` - Main builder interface
 - `ComponentLibrary.vue` - Available components
 - `ComponentCanvas.vue` - Drag-and-drop canvas
@@ -279,6 +307,7 @@ CREATE TABLE landing_pages (
 - `PagePreview.vue` - Mobile/Desktop preview
 
 **Pre-built Components:**
+
 - Hero Section
 - Features Grid
 - Pricing Table
@@ -291,6 +320,7 @@ CREATE TABLE landing_pages (
 ### 4.3 Publishing System
 
 **Features:**
+
 - Save drafts
 - Publish to live URL (tenant.domain.com/landing)
 - Version history with rollback
@@ -303,12 +333,14 @@ CREATE TABLE landing_pages (
 ### 5.1 Dashboard Backend - Analytics API (Go)
 
 **Endpoints:**
+
 - `GET /api/dashboard/stats` - Key metrics
 - `GET /api/dashboard/revenue` - Revenue data by period
 - `GET /api/dashboard/cars` - Car status summary
 - `GET /api/dashboard/bookings` - Recent bookings
 
 **Backend Logic:**
+
 - Efficient SQL queries with proper indexing
 - Caching with Redis (optional self-hosted)
 - Real-time stats via WebSocket (optional)
@@ -316,6 +348,7 @@ CREATE TABLE landing_pages (
 ### 5.2 Dashboard Frontend - Vue.js Components
 
 **Main Dashboard Components:**
+
 - `DashboardHome.vue` - Main overview
 - `StatsCards.vue` - Key metrics display
 - `RevenueChart.vue` - Line/Bar charts
@@ -323,6 +356,7 @@ CREATE TABLE landing_pages (
 - `BookingsTable.vue` - Recent rentals
 
 **Dashboard Navigation:**
+
 - Sidebar with modules
 - Responsive mobile menu
 - User profile dropdown
@@ -332,6 +366,7 @@ CREATE TABLE landing_pages (
 **5.3.1 Cars API (Go)**
 
 **Endpoints:**
+
 - `GET /api/cars` - List all cars (with filters, pagination)
 - `POST /api/cars` - Add new car
 - `GET /api/cars/{id}` - Get car details
@@ -341,6 +376,7 @@ CREATE TABLE landing_pages (
 - `GET /api/cars/{id}/maintenance` - Maintenance history
 
 **Car Data Model (PostgreSQL):**
+
 ```sql
 CREATE TABLE cars (
   id UUID PRIMARY KEY,
@@ -365,6 +401,7 @@ CREATE TABLE cars (
 **5.3.2 Cars Frontend (Vue.js)**
 
 **Components:**
+
 - `CarsList.vue` - Table view of all cars
 - `CarForm.vue` - Add/Edit car modal
 - `CarDetail.vue` - Car detail page
@@ -372,6 +409,7 @@ CREATE TABLE cars (
 - `CarImageGallery.vue` - Image upload/view
 
 **Features:**
+
 - Search and filter (by status, category, availability)
 - Bulk actions (status change, delete)
 - Image upload with preview
@@ -383,6 +421,7 @@ CREATE TABLE cars (
 **5.4.1 Bookings API (Go)**
 
 **Endpoints:**
+
 - `GET /api/bookings` - List all bookings (with filters)
 - `POST /api/bookings` - Create new booking
 - `GET /api/bookings/{id}` - Get booking details
@@ -392,6 +431,7 @@ CREATE TABLE cars (
 - `GET /api/bookings/{id}/invoice` - Generate invoice
 
 **Booking Data Model:**
+
 ```sql
 CREATE TABLE bookings (
   id UUID PRIMARY KEY,
@@ -416,6 +456,7 @@ CREATE TABLE bookings (
 **5.4.2 Bookings Frontend (Vue.js)**
 
 **Components:**
+
 - `BookingsList.vue` - Table with filters
 - `BookingForm.vue` - Create/Edit booking modal
 - `BookingDetail.vue` - Booking detail page
@@ -423,6 +464,7 @@ CREATE TABLE bookings (
 - `BookingActions.vue` - Quick action buttons
 
 **Calendar Features:**
+
 - Month/Week/Day views
 - Color-coded by status
 - Drag-to-reschedule (optional)
@@ -431,6 +473,7 @@ CREATE TABLE bookings (
 ### 5.5 Customer Management
 
 **Endpoints:**
+
 - `GET /api/customers` - List all customers
 - `POST /api/customers` - Add customer
 - `GET /api/customers/{id}` - Get customer details
@@ -438,6 +481,7 @@ CREATE TABLE bookings (
 - `GET /api/customers/{id}/bookings` - Customer booking history
 
 **Database:**
+
 ```sql
 CREATE TABLE customers (
   id UUID PRIMARY KEY,
@@ -459,12 +503,14 @@ CREATE TABLE customers (
 ### 5.6 Financial Management Backend (Go)
 
 **Endpoints:**
+
 - `GET /api/financials/revenue` - Revenue by period
 - `GET /api/financials/expenses` - Expense tracking
 - `GET /api/financials/invoices` - List invoices
 - `POST /api/financials/invoices/{id}/send` - Send invoice
 
 **Invoice Generation:**
+
 - Generate PDF invoices
 - Email invoice to customer
 - Track payment status
@@ -476,11 +522,13 @@ CREATE TABLE customers (
 ### 6.1 Notifications System (Go + Vue.js)
 
 **Backend:**
+
 - Email service integration (SMTP configuration)
 - Notification templates
 - Scheduled notifications
 
 **Frontend:**
+
 - In-app notification center
 - Toast notifications
 - Notification preferences
@@ -488,6 +536,7 @@ CREATE TABLE customers (
 ### 6.2 Document Management
 
 **Features:**
+
 - Document upload API
 - File storage on server (or NAS)
 - License/insurance document tracking
@@ -496,6 +545,7 @@ CREATE TABLE customers (
 ### 6.3 Reporting System
 
 **Reports Available:**
+
 - Fleet utilization report
 - Revenue report (by period)
 - Customer acquisition report
@@ -503,6 +553,7 @@ CREATE TABLE customers (
 - Maintenance cost analysis
 
 **Export Formats:**
+
 - PDF
 - Excel
 - CSV
@@ -510,6 +561,7 @@ CREATE TABLE customers (
 ### 6.4 Audit Logging
 
 **Implementation:**
+
 - Log all user actions
 - Track who changed what and when
 - Audit trail per tenant
@@ -522,6 +574,7 @@ CREATE TABLE customers (
 ### 7.1 Security Implementation (Go Backend)
 
 **Requirements:**
+
 - Input validation on all endpoints
 - SQL injection prevention (prepared statements via pgx)
 - XSS protection (Vue.js escaping, HTTP-only cookies)
@@ -532,6 +585,7 @@ CREATE TABLE customers (
 - CORS configuration
 
 **Go Security Packages:**
+
 - `gorilla/csrf` - CSRF protection
 - `golang-jwt/jwt` - JWT handling
 - `golang.org/x/crypto/bcrypt` - Password hashing
@@ -539,16 +593,19 @@ CREATE TABLE customers (
 ### 7.2 Performance Optimization
 
 **Database:**
+
 - Add indexes on frequently queried columns
 - Query optimization for large datasets
 - Connection pooling limits
 
 **Backend:**
+
 - Response caching (HTTP cache headers)
 - Gzip compression
 - Efficient JSON serialization
 
 **Frontend:**
+
 - Code splitting by route (Vue.js lazy loading)
 - Image optimization
 - CSS/JS minification by Vite
@@ -557,6 +614,7 @@ CREATE TABLE customers (
 ### 7.3 Backup & Disaster Recovery
 
 **Backup Strategy:**
+
 - Daily automated PostgreSQL backups
 - Incremental backups (optional)
 - Backup verification (restore test weekly)
@@ -564,6 +622,7 @@ CREATE TABLE customers (
 - Per-tenant backup isolation
 
 **Backup Script (Bash):**
+
 ```bash
 # Daily backup script for all PostgreSQL databases
 # Run via cron job: 0 2 * * * /usr/local/bin/backup-postgres.sh
@@ -572,6 +631,7 @@ CREATE TABLE customers (
 ### 7.4 Monitoring & Alerting
 
 **Tools (Self-Hosted):**
+
 - Prometheus - Metrics collection
 - Grafana - Dashboard visualization
 - AlertManager - Alert routing
@@ -579,6 +639,7 @@ CREATE TABLE customers (
 - cAdvisor - Container metrics
 
 **Monitored Metrics:**
+
 - CPU usage
 - Memory usage
 - Disk space
@@ -594,18 +655,21 @@ CREATE TABLE customers (
 ### 8.1 Go Backend Testing
 
 **Test Types:**
+
 - Unit tests (80%+ coverage target)
 - Integration tests (API endpoints)
 - Database tests (with test DB)
 - Load testing (Apache Bench, wrk)
 
 **Testing Framework:**
+
 - `testing` (standard library)
 - `testify` (assertions and mocking)
 
 ### 8.2 Vue.js Frontend Testing
 
 **Test Types:**
+
 - Component tests (Vitest)
 - E2E tests (Playwright or Cypress)
 - Visual regression tests
@@ -613,6 +677,7 @@ CREATE TABLE customers (
 ### 8.3 Security Testing
 
 **Activities:**
+
 - OWASP Top 10 validation
 - SQL injection testing
 - XSS vulnerability testing
@@ -622,6 +687,7 @@ CREATE TABLE customers (
 ### 8.4 Performance Testing
 
 **Benchmarks:**
+
 - Page load time: < 2 seconds
 - API response time: < 200ms
 - Dashboard with 1000 cars: < 3 seconds
@@ -633,6 +699,7 @@ CREATE TABLE customers (
 ### 9.1 Deployment Setup
 
 **Deliverables:**
+
 - Docker Compose production setup
 - Nginx configuration files
 - SSL certificate setup
@@ -640,32 +707,33 @@ CREATE TABLE customers (
 - Backup automation running
 
 **docker-compose.yml Structure:**
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   nginx:
     image: nginx:latest
     ports: [80, 443]
     volumes: [nginx.conf, ssl-certs]
-  
+
   backend:
     build: ./backend
     environment: [DATABASE_URL, JWT_SECRET]
     depends_on: [postgres]
-  
+
   frontend:
     build: ./frontend
     depends_on: [backend]
-  
+
   postgres:
     image: postgres:15
     volumes: [pgdata]
     environment: [POSTGRES_PASSWORD]
-  
+
   prometheus:
     image: prom/prometheus
     volumes: [prometheus.yml]
-  
+
   grafana:
     image: grafana/grafana
     ports: [3000]
@@ -680,6 +748,7 @@ services:
 ### 9.3 Production Launch
 
 **Launch Checklist:**
+
 - All tests passing
 - Monitoring active
 - Backup verified
@@ -694,16 +763,19 @@ services:
 ### 10.1 Monitoring & Maintenance
 
 **Daily Tasks:**
+
 - Check monitoring dashboards
 - Review error logs
 - Verify backups completed
 
 **Weekly Tasks:**
+
 - Performance analysis
 - Security patch updates
 - Database maintenance
 
 **Monthly Tasks:**
+
 - Full backup restore test
 - Performance optimization review
 - Capacity planning
@@ -711,6 +783,7 @@ services:
 ### 10.2 Future Enhancements
 
 **Phase 11+ Features:**
+
 - Mobile app (Flutter - use your expertise!)
 - Advanced analytics
 - AI-based pricing optimization
@@ -724,6 +797,7 @@ services:
 ## Development Team Structure
 
 **Recommended Team:**
+
 - 2x Go Backend Developers
 - 2x Vue.js Frontend Developers
 - 1x DevOps/System Administrator (Self-hosted infrastructure)
@@ -736,12 +810,14 @@ services:
 ## Cost Estimation (Self-Hosted)
 
 ### Hardware (One-time)
+
 - Server: $2,000-4,000 (or lease $100-200/month)
 - Backup NAS: $500-1,500
 - UPS: $300-500
 - **Total:** $2,800-6,000 (or $400-700/month if leased)
 
 ### Annual Operating Costs
+
 - Internet: $100-200/month ($1,200-2,400/year)
 - Domain & DNS: $15-30/year
 - SSL Certificates: Free (Let's Encrypt)
@@ -749,6 +825,7 @@ services:
 - **Total Annual:** $2,400-4,500
 
 ### Development (One-time)
+
 - ~1,500-2,000 development hours
 - At $50/hour: $75,000-100,000
 - At $100/hour: $150,000-200,000
@@ -760,6 +837,7 @@ services:
 ## Technology Advantages: Go + Vue.js + Self-Hosted
 
 ### Why Go?
+
 - ✅ Fast compilation and deployment
 - ✅ Excellent concurrency (goroutines)
 - ✅ Small binary size (easy Docker deployment)
@@ -768,6 +846,7 @@ services:
 - ✅ Low memory footprint
 
 ### Why Vue.js?
+
 - ✅ Gentle learning curve
 - ✅ Reactive and responsive UI
 - ✅ Excellent documentation
@@ -776,6 +855,7 @@ services:
 - ✅ Easy component reusability
 
 ### Why Self-Hosted?
+
 - ✅ Full data control
 - ✅ Lower long-term costs
 - ✅ Customization freedom
@@ -789,6 +869,7 @@ services:
 ## Migration from Development to Production
 
 **Key Steps:**
+
 1. Separate dev/prod environments
 2. Environment variable management
 3. Production database optimization
@@ -803,6 +884,7 @@ services:
 ## Troubleshooting & Support Strategy
 
 **Common Self-Hosted Issues:**
+
 - Database connection pooling exhaustion
 - Disk space monitoring
 - Memory leaks in long-running processes
@@ -811,6 +893,7 @@ services:
 - SSL certificate renewal
 
 **Mitigation:**
+
 - Comprehensive monitoring dashboards
 - Automated alerting
 - Documentation and runbooks
@@ -830,4 +913,4 @@ services:
 
 ---
 
-*This roadmap is optimized for Go backend, Vue.js frontend, and self-hosted deployment. Review quarterly and adjust based on performance and scaling needs.*
+_This roadmap is optimized for Go backend, Vue.js frontend, and self-hosted deployment. Review quarterly and adjust based on performance and scaling needs._

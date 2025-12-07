@@ -17,7 +17,7 @@ func LogAudit(c *gin.Context, action string, details interface{}) {
 		// Can't log if we don't know the tenant DB
 		return
 	}
-	tenant := tenantCtx.(models.Tenant)
+	tenant := tenantCtx.(*models.Tenant)
 	db, err := database.GetTenantDB(tenant.DBName)
 	if err != nil {
 		return

@@ -26,7 +26,7 @@ func getTenantDBForNotifications(c *gin.Context) (*pgxpool.Pool, *models.Tenant,
 	if !exists {
 		return nil, nil, "", context.Canceled
 	}
-	tenant := tenantCtx.(models.Tenant)
+	tenant := tenantCtx.(*models.Tenant)
 
 	userIDCtx, exists := c.Get("user_id")
 	var userID string
@@ -35,7 +35,7 @@ func getTenantDBForNotifications(c *gin.Context) (*pgxpool.Pool, *models.Tenant,
 	}
 
 	db, err := database.GetTenantDB(tenant.DBName)
-	return db, &tenant, userID, err
+	return db, tenant, userID, err
 }
 
 func GetNotifications(c *gin.Context) {

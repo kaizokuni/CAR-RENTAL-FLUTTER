@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Building2, Users, TrendingUp, Plus, LogIn, CreditCard } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import { getTenantUrl, config } from '@/config/env'
 import {
   Dialog,
   DialogContent,
@@ -47,7 +48,7 @@ const formatDate = (dateString: string) => {
 }
 
 const getSubdomainUrl = (subdomain: string) => {
-  return `http://${subdomain}.localhost:5173`
+  return getTenantUrl(subdomain)
 }
 
 interface Tenant {
@@ -199,7 +200,7 @@ const getTierBadgeColor = (tier?: string) => {
                     target="_blank"
                     class="hover:underline hover:text-primary"
                   >
-                    {{ tenant.subdomain }}.localhost:5173
+                    {{ getSubdomainUrl(tenant.subdomain).replace('http://', '').replace('https://', '') }}
                   </a>
                   <span>•</span>
                   <span>Created {{ formatDate(tenant.created_at) }}</span>

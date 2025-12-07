@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS tenants (
     subdomain VARCHAR(100) UNIQUE NOT NULL,
     db_name VARCHAR(255) NOT NULL,
     subscription_tier VARCHAR(20) DEFAULT 'normal' CHECK (subscription_tier IN ('normal', 'pro', 'premium')),
+    logo_url TEXT,
+    payment_method VARCHAR(50) DEFAULT 'online',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -38,6 +40,9 @@ CREATE TABLE IF NOT EXISTS cars (
     license_plate VARCHAR(20) UNIQUE NOT NULL,
     status VARCHAR(20) DEFAULT 'Available',
     price_per_day DECIMAL(10, 2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'MAD',
+    category VARCHAR(50),
+    images JSONB DEFAULT '[]',
     image_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -83,8 +88,11 @@ CREATE TABLE IF NOT EXISTS bookings (
     customer_id UUID REFERENCES customers(id),
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(20) DEFAULT 'Pending',
+    price_per_day DECIMAL(10, 2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'MAD',
+    image_url TEXT, -- Keeping for backward compatibility or single cover
+    images TEXT[], -- Array of image URLs
+    status VARCHAR(20) DEFAULT 'available' CHECK (status IN ('available', 'rented', 'maintenance')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

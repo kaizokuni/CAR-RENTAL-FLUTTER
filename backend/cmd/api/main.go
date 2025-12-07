@@ -65,7 +65,13 @@ func main() {
 
 		protected.GET("/reports/utilization", handlers.GetFleetUtilization)
 		protected.GET("/reports/revenue-by-car", handlers.GetRevenueByCar)
+
+		// Image upload
+		protected.POST("/cars/upload-image", handlers.UploadCarImage)
 	}
+
+	// Serve uploaded files
+	r.Static("/uploads", "./uploads")
 
 	admin := r.Group("/api/v1/admin")
 	// Protect admin routes - require authentication AND super_admin role

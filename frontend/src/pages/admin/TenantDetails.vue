@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, Building2, Calendar, Database, Globe, Mail, Shield, Trash2, LogIn, CreditCard } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import { getTenantUrl, config } from '@/config/env'
 import {
   Dialog,
   DialogContent,
@@ -75,7 +76,7 @@ const formatDate = (dateString: string) => {
 }
 
 const getSubdomainUrl = (subdomain: string) => {
-  return `http://${subdomain}.localhost:5173`
+  return getTenantUrl(subdomain)
 }
 
 const handleImpersonate = async () => {
@@ -158,7 +159,7 @@ const getTierBadgeColor = (tier?: string) => {
                 <CardDescription class="mt-2 flex items-center gap-2">
                   <Globe class="h-4 w-4" />
                   <a :href="getSubdomainUrl(tenant.subdomain)" target="_blank" class="hover:underline text-primary">
-                    {{ tenant.subdomain }}.localhost:5173
+                    {{ getSubdomainUrl(tenant.subdomain).replace('http://', '').replace('https://', '') }}
                   </a>
                 </CardDescription>
               </div>

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useAuthStore } from './auth'
+import { getApiEndpoint } from '@/config/env'
 
 export interface Car {
   id: string
@@ -10,7 +11,10 @@ export interface Car {
   license_plate: string
   status: 'available' | 'rented' | 'maintenance'
   price_per_day: number
-  image_url?: string
+  category?: string
+  currency?: string
+  images?: string[]
+  image_url?: string  // Kept for backward compatibility
 }
 
 export const useCarsStore = defineStore('cars', () => {
@@ -19,8 +23,7 @@ export const useCarsStore = defineStore('cars', () => {
   const error = ref('')
 
   const authStore = useAuthStore()
-  // Use localhost:8080 for backend API
-  const API_URL = 'http://localhost:8080/api/v1'
+  const API_URL = getApiEndpoint('/api/v1')
 
   async function fetchCars() {
     isLoading.value = true

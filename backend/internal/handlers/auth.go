@@ -165,7 +165,7 @@ func Login(c *gin.Context) {
 	}
 
 	// Log Audit (set tenant and user_id in context for audit)
-	c.Set("tenant", tenantModel)
+	c.Set("tenant", &tenantModel)
 	c.Set("user_id", foundUser.ID)
 	audit.LogAudit(c, "LOGIN", gin.H{"email": req.Email})
 
