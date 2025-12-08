@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Car as CarIcon, Search, Filter, ChevronRight, ChevronLeft, CheckCircle2, MoreVertical, Pencil, Trash2, AlertTriangle } from 'lucide-vue-next'
+import { Plus, Car as CarIcon, Search, Filter, ChevronRight, ChevronLeft, CheckCircle2, MoreVertical, Pencil, Trash2, AlertTriangle, X as LucideX, Eye } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import {
   Dialog,
@@ -40,6 +40,7 @@ const isSubmitting = ref(false)
 const isDeleting = ref(false)
 const editingCarId = ref<string | null>(null)
 const carToDelete = ref<Car | null>(null)
+const viewingCar = ref<Car | null>(null)
 
 // Car Database State
 // const carDatabase = ref<any>(null) // Removed duplicate
@@ -351,14 +352,18 @@ watch(() => newCar.model, (newModel) => {
           </div>
 
           <!-- Actions Dropdown -->
-          <div class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
-                <Button variant="secondary" size="icon" class="h-8 w-8 rounded-full shadow-sm">
+                <Button variant="secondary" size="icon" class="h-8 w-8 rounded-full shadow-lg bg-background/90 backdrop-blur-sm">
                   <MoreVertical class="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
+                 <DropdownMenuItem @click="viewingCar = car">
+                   <Eye class="mr-2 h-4 w-4" />
+                   View Details
+                 </DropdownMenuItem>
                 <DropdownMenuItem @click="openEditDialog(car)">
                   <Pencil class="mr-2 h-4 w-4" />
                   Edit Vehicle
@@ -646,5 +651,94 @@ watch(() => newCar.model, (newModel) => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <!-- Details Sheet/Drawer -->
+    <div 
+       v-if="viewingCar" 
+       class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+       @click="viewingCar = null"
+    ></div>
+    <div 
+      class="fixed inset-y-0 right-0 z-50 h-full w-full border-l bg-background p-6 shadow-lg transition-transform sm:max-w-md duration-300 ease-in-out transform"
+      :class="viewingCar ? 'translate-x-0' : 'translate-x-full'"
+    >
+      <div v-if="viewingCar" class="flex h-full flex-col gap-6">
+         <!-- Header -->
+        <div class="flex items-start justify-between">
+           <div>
+              <h2 class="text-2xl font-bold">{{ viewingCar.make }} {{ viewingCar.model }}</h2>
+              <p class="text-muted-foreground">{{ viewingCar.year }} • {{ viewingCar.license_plate }}</p>
+           </div>
+           <Button variant="ghost" size="icon" @click="viewingCar = null">
+             <LucideX class="h-5 w-5" />
+           </Button>
+        </div>
+        
+        <!-- Image Cover -->
+        <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
+           <img 
+            v-if="viewingCar.image_url"
+            :src="viewingCar.image_url" 
+            class="h-full w-full object-cover"
+            alt="Car Cover"
+           />
+           <div v-else class="flex h-full w-full items-center justify-center">
+             <CarIcon class="h-12 w-12 text-muted-foreground/30" />
+           </div>
+           <div class="absolute top-3 right-3">
+             <span class="rounded-full bg-background/80 px-3 py-1 text-sm font-semibold backdrop-blur-sm shadow-sm" :class="getStatusColor(viewingCar.status)">
+               {{ viewingCar.status }}
+             </span>
+           </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div v-if="viewingCar.images && viewingCar.images.length > 1" class="space-y-2">
+           <h3 class="font-semibold text-sm text-foreground/80">Gallery</h3>
+           <div class="grid grid-cols-4 gap-2">
+              <div 
+                v-for="(img, idx) in viewingCar.images" 
+                :key="idx" 
+                class="aspect-square overflow-hidden rounded-md bg-muted cursor-pointer hover:ring-2 hover:ring-primary/50"
+                @click="viewingCar.image_url = img" 
+              >
+                 <img :src="img" class="h-full w-full object-cover" />
+              </div>
+           </div>
+        </div>
+
+        <!-- Details List -->
+        <div class="grid grid-cols-2 gap-4 border-t pt-4">
+           <div class="space-y-1">
+              <span class="text-xs text-muted-foreground uppercase">Daily Rate</span>
+              <div class="font-bold text-xl">{{ viewingCar.price_per_day }} {{ viewingCar.currency }}</div>
+           </div>
+           <div class="space-y-1">
+              <span class="text-xs text-muted-foreground uppercase">License Plate</span>
+              <div class="font-medium font-mono bg-muted px-2 py-0.5 rounded inline-block text-sm">{{ viewingCar.license_plate }}</div>
+           </div>
+           <div class="space-y-1">
+              <span class="text-xs text-muted-foreground uppercase">Created At</span>
+              <!-- <div class="text-sm">...</div> -->
+              <!-- We don't have created_at in frontend model, omitting for now -->
+              <div class="text-sm font-medium">-</div>
+           </div>
+        </div>
+
+        <div class="flex-1"></div>
+
+        <!-- Footer Actions -->
+        <div class="flex gap-2 border-t pt-4">
+           <Button class="flex-1" @click="() => { openEditDialog(viewingCar!); viewingCar = null; }">
+             <Pencil class="mr-2 h-4 w-4" />
+             Edit Vehicle
+           </Button>
+           <Button variant="outline" class="flex-1 text-destructive hover:bg-destructive/10" @click="() => { confirmDelete(viewingCar!); viewingCar = null; }">
+             <Trash2 class="mr-2 h-4 w-4" />
+             Delete
+           </Button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

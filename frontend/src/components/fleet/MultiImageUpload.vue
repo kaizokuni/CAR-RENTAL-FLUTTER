@@ -37,6 +37,7 @@ const images = ref<string[]>([...props.modelValue])
 const isUploading = ref(false)
 const uploadError = ref('')
 const fileInputRef = ref<HTMLInputElement | null>(null)
+const isDragging = ref(false)
 
 // Sync from parent
 watch(() => props.modelValue, (newVal) => {
@@ -63,6 +64,7 @@ const uploadFile = async (file: File): Promise<string | null> => {
     }
 
     const data = await response.json()
+    // Backend returns relative path "/uploads/...", ensure it's usable if needed but sticking to what backend gives
     return data.url
   } catch (error: any) {
     console.error('Upload error:', error)
@@ -109,6 +111,26 @@ const handleFiles = async (files: FileList | null) => {
   }
 }
 
+// Drag and drop handlers
+const onDrop = async (e: DragEvent) => {
+  isDragging.value = false
+  const files = e.dataTransfer?.files
+  if (files) {
+    await handleFiles(files)
+  }
+}
+
+const onDragOver = (e: DragEvent) => {
+  isDragging.value = true
+}
+
+const onDragLeave = (e: DragEvent) => {
+  // Prevent flickering by checking related target
+  if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) {
+    isDragging.value = false
+  }
+}
+
 const openFileDialog = () => {
   fileInputRef.value?.click()
 }
@@ -135,6 +157,17 @@ const moveRight = (index: number) => {
     emit('update:modelValue', [...images.value])
   }
 }
+
+// Helper to get full URL or proxy URL
+const getImageUrl = (url: string) => {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  // With configured proxy, /uploads normally works relative to root. 
+  // But if that fails, one might need full backend URL.
+  // We'll rely on relative path working due to proxy.
+  return url 
+}
 </script>
 
 <template>
@@ -152,7 +185,10 @@ const moveRight = (index: number) => {
     <!-- Drop area / Image grid -->
     <div
       class="border-input relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors"
-      :class="{ 'justify-center': images.length === 0 }"
+      :class="{ 'justify-center': images.length === 0, 'border-primary bg-primary/5 ring-2 ring-primary/20': isDragging }"
+      @dragover.prevent="onDragOver"
+      @dragleave.prevent="onDragLeave"
+      @drop.prevent="onDrop"
     >
       <!-- Images grid -->
       <div v-if="images.length > 0" class="flex w-full flex-col gap-3">
@@ -183,7 +219,7 @@ const moveRight = (index: number) => {
             </div>
 
             <img
-              :src="url.startsWith('/') ? getApiEndpoint(url) : url"
+              :src="getImageUrl(url)"
               alt="Car image"
               class="size-full rounded-[inherit] object-cover transition-transform group-hover:scale-105"
             />
@@ -229,7 +265,7 @@ const moveRight = (index: number) => {
       </div>
 
       <!-- Empty state -->
-      <div v-else class="flex flex-col items-center justify-center px-4 py-3 text-center">
+      <div v-else class="flex flex-col items-center justify-center px-4 py-3 text-center pointer-events-none">
         <div
           class="bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border"
           aria-hidden="true"
@@ -243,7 +279,7 @@ const moveRight = (index: number) => {
         <Button 
           variant="outline" 
           type="button" 
-          class="mt-4" 
+          class="mt-4 pointer-events-auto" 
           @click="openFileDialog"
           :disabled="isUploading"
         >
