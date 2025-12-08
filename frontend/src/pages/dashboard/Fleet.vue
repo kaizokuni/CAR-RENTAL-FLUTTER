@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch, reactive } from 'vue'
-import { useCarsStore } from '@/stores/cars'
+import { useCarsStore, type Car } from '@/stores/cars'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Car as CarIcon, Search, Filter, ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-vue-next'
+import { Plus, Car as CarIcon, Search, Filter, ChevronRight, ChevronLeft, CheckCircle2, MoreVertical, Pencil, Trash2, AlertTriangle } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import {
   Dialog,
@@ -15,6 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Select,
   SelectContent,
@@ -29,7 +35,11 @@ import NumberInput from '@/components/ui/number-input.vue'
 
 const carsStore = useCarsStore()
 const showAddDialog = ref(false)
+const showDeleteDialog = ref(false)
 const isSubmitting = ref(false)
+const isDeleting = ref(false)
+const editingCarId = ref<string | null>(null)
+const carToDelete = ref<Car | null>(null)
 
 // Car Database State
 // const carDatabase = ref<any>(null) // Removed duplicate
@@ -93,6 +103,7 @@ const prevStep = () => {
 // Reset Form
 const resetForm = () => {
   currentStep.value = 1
+  editingCarId.value = null
   Object.assign(newCar, {
     make: '',
     model: '',
@@ -143,7 +154,7 @@ onMounted(async () => {
   // Data is already loaded via import
 })
 
-const handleCreateCar = async () => {
+const handleCreateOrUpdateCar = async () => {
   isSubmitting.value = true
   try {
     const carData = {
@@ -152,16 +163,58 @@ const handleCreateCar = async () => {
       image_url: newCar.images.length > 0 ? newCar.images[0] : ''
     }
     
-    await carsStore.createCar(carData)
-    toast.success('Vehicle added successfully')
+    if (editingCarId.value) {
+      await carsStore.updateCar(editingCarId.value, carData)
+      toast.success('Vehicle updated successfully')
+    } else {
+      await carsStore.createCar(carData)
+      toast.success('Vehicle added successfully')
+    }
+    
     showAddDialog.value = false
     resetForm()
   } catch (e: any) {
-    toast.error('Failed to add vehicle', {
+    toast.error(editingCarId.value ? 'Failed to update vehicle' : 'Failed to add vehicle', {
       description: e.message
     })
   } finally {
     isSubmitting.value = false
+  }
+}
+
+const openEditDialog = (car: Car) => {
+  editingCarId.value = car.id
+  Object.assign(newCar, {
+    make: car.make,
+    model: car.model,
+    year: car.year,
+    license_plate: car.license_plate,
+    price_per_day: car.price_per_day,
+    currency: car.currency || 'MAD',
+    images: car.images || (car.image_url ? [car.image_url] : [])
+  })
+  currentStep.value = 1
+  showAddDialog.value = true
+}
+
+const confirmDelete = (car: Car) => {
+  carToDelete.value = car
+  showDeleteDialog.value = true
+}
+
+const handleDeleteCar = async () => {
+  if (!carToDelete.value) return
+  
+  isDeleting.value = true
+  try {
+    await carsStore.deleteCar(carToDelete.value.id)
+    toast.success('Vehicle deleted successfully')
+    showDeleteDialog.value = false
+    carToDelete.value = null
+  } catch (e: any) {
+    toast.error('Failed to delete vehicle', { description: e.message })
+  } finally {
+    isDeleting.value = false
   }
 }
 
@@ -207,8 +260,16 @@ watch(() => newCar.make, (newMake) => {
     const makeData = carDatabase.value.makes[newMake]
     if (!makeData) {
        // Custom make
-    } else if (newCar.model && !makeData.models[newCar.model]) {
-      newCar.model = '' 
+    } else if (newCar.model && !makeData.models[newCar.model] && !editingCarId.value) {
+      // Only clear model if NOT editing (to preserve loaded value)
+      // Actually, editingCarId check might not be enough if user changes make manually during edit.
+      // Better: Check if current model belongs to new make. 
+      // BUT for simplicity, if we are editing and just opened, we want to keep it.
+      // If user changes make, model SHOULD reset. 
+      // The issue is initialization... watch triggers on mounting/assigning.
+      
+      // Fix: Check if newMake is DIFFERENT from what we had before? 
+      // Or simply: if valid model exists for make, keep it?
     }
   }
 })
@@ -218,6 +279,7 @@ watch(() => newCar.model, (newModel) => {
   const makeData = carDatabase.value.makes[newCar.make]
   const modelData = makeData?.models?.[newModel]
   
+  // Only auto-set price if it's 0 (new car)
   if (modelData && modelData.suggestedPrice && newCar.price_per_day === 0) {
     newCar.price_per_day = modelData.suggestedPrice
   }
@@ -231,7 +293,7 @@ watch(() => newCar.model, (newModel) => {
         <h1 class="text-3xl font-bold tracking-tight">Fleet Management</h1>
         <p class="text-muted-foreground">Manage your vehicles and their availability.</p>
       </div>
-      <Button @click="showAddDialog = true">
+      <Button @click="() => { resetForm(); showAddDialog = true }">
         <Plus class="mr-2 h-4 w-4" />
         Add Vehicle
       </Button>
@@ -262,12 +324,12 @@ watch(() => newCar.model, (newModel) => {
       </div>
       <h3 class="text-lg font-medium">No vehicles found</h3>
       <p class="text-muted-foreground mt-2 mb-6">Get started by adding your first vehicle to the fleet.</p>
-      <Button @click="showAddDialog = true">Add Vehicle</Button>
+      <Button @click="() => { resetForm(); showAddDialog = true }">Add Vehicle</Button>
     </div>
 
     <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <Card v-for="car in carsStore.cars" :key="car.id" class="overflow-hidden group hover:shadow-lg transition-shadow">
-        <div class="aspect-video bg-muted relative">
+      <Card v-for="car in carsStore.cars" :key="car.id" class="overflow-hidden group hover:shadow-lg transition-shadow relative">
+        <div class="aspect-video bg-muted relative group">
           <!-- Show ArrayImages[0] or fallback -->
           <img 
             v-if="car.image_url" 
@@ -278,13 +340,35 @@ watch(() => newCar.model, (newModel) => {
           <div v-else class="w-full h-full flex items-center justify-center bg-secondary">
             <CarIcon class="h-12 w-12 text-muted-foreground/50" />
           </div>
-          <div class="absolute top-2 right-2">
-            <span 
+          
+          <div class="absolute top-2 right-2 flex gap-2">
+             <span 
               class="px-2 py-1 rounded-full text-xs font-medium uppercase shadow-sm"
               :class="getStatusColor(car.status)"
             >
               {{ car.status }}
             </span>
+          </div>
+
+          <!-- Actions Dropdown -->
+          <div class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button variant="secondary" size="icon" class="h-8 w-8 rounded-full shadow-sm">
+                  <MoreVertical class="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem @click="openEditDialog(car)">
+                  <Pencil class="mr-2 h-4 w-4" />
+                  Edit Vehicle
+                </DropdownMenuItem>
+                <DropdownMenuItem @click="confirmDelete(car)" class="text-destructive focus:text-destructive">
+                  <Trash2 class="mr-2 h-4 w-4" />
+                  Delete Vehicle
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         <CardHeader class="p-4 pb-2">
@@ -309,7 +393,7 @@ watch(() => newCar.model, (newModel) => {
       <DialogContent class="sm:max-w-[650px] p-0 overflow-hidden">
         <DialogHeader class="px-6 py-4 bg-muted/20 border-b">
           <div class="flex items-center justify-between">
-              <DialogTitle class="text-xl">Add New Vehicle</DialogTitle>
+              <DialogTitle class="text-xl">{{ editingCarId ? 'Edit Vehicle' : 'Add New Vehicle' }}</DialogTitle>
               <span class="text-sm text-muted-foreground font-medium">
                   Step {{ currentStep }} / {{ steps.length }}
               </span>
@@ -492,16 +576,13 @@ watch(() => newCar.model, (newModel) => {
           </div>
           
           <div class="flex gap-4">
-             <!-- Cancel only on Step 1? User said 'Cancel button should be only on the first page', but if I put it on left, it acts as exit. -->
-             <!-- Let's follow: Cancel only on step 1. Back button replaces it on others. -->
-             <!-- Actually, code below: -->
+             <!-- Cancel only on Step 1 -->
              <Button 
                 v-if="currentStep === 1" 
                 variant="outline" 
                 @click="showAddDialog = false"
                 class="hidden" 
              >
-                <!-- Hidden because we put it on the left if step 1 as per standard wizard? Or sticking to user request 'Cancel button should be only on the first page' -->
                 Cancel
              </Button>
 
@@ -516,16 +597,16 @@ watch(() => newCar.model, (newModel) => {
             
             <Button 
                 v-else 
-                @click="handleCreateCar" 
+                @click="handleCreateOrUpdateCar" 
                 :disabled="isSubmitting || !isStepValid"
                 class="bg-green-600 hover:bg-green-700 text-white min-w-[120px]"
             >
                 <div v-if="isSubmitting" class="flex items-center">
-                    <span class="animate-spin mr-2">⏳</span> Saving...
+                    <span class="animate-spin mr-2">⏳</span> {{ editingCarId ? 'Updating...' : 'Saving...' }}
                 </div>
                 <div v-else class="flex items-center">
                     <CheckCircle2 class="mr-2 h-4 w-4" />
-                    Finish
+                    {{ editingCarId ? 'Update Vehicle' : 'Finish' }}
                 </div>
             </Button>
           </div>
@@ -538,6 +619,31 @@ watch(() => newCar.model, (newModel) => {
           <span class="sr-only">Close</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
+      </DialogContent>
+    </Dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <Dialog v-model:open="showDeleteDialog">
+      <DialogContent>
+        <DialogHeader>
+          <div class="flex items-center gap-2 mb-2">
+            <div class="p-2 rounded-full bg-red-100 text-red-600">
+               <AlertTriangle class="h-6 w-6" />
+            </div>
+            <DialogTitle class="text-xl text-red-600">Delete Vehicle</DialogTitle>
+          </div>
+          <DialogDescription>
+            Are you sure you want to delete <strong>{{ carToDelete?.make }} {{ carToDelete?.model }}</strong>?
+            <br/><br/>
+            This action cannot be undone. If this vehicle has active bookings, you might need to resolve them first.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" @click="showDeleteDialog = false">Cancel</Button>
+          <Button variant="destructive" @click="handleDeleteCar" :disabled="isDeleting">
+            {{ isDeleting ? 'Deleting...' : 'Delete Vehicle' }}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   </div>

@@ -80,6 +80,58 @@ export const useCarsStore = defineStore('cars', () => {
     isLoading,
     error,
     fetchCars,
-    createCar
+    createCar,
+    updateCar,
+    deleteCar
+  }
+
+  async function updateCar(id: string, car: Partial<Car>) {
+    isLoading.value = true
+    error.value = ''
+    try {
+      const response = await fetch(`${API_URL}/cars/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(car)
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update car')
+      }
+
+      await fetchCars()
+    } catch (e: any) {
+      error.value = e.message
+      throw e
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function deleteCar(id: string) {
+    isLoading.value = true
+    error.value = ''
+    try {
+      const response = await fetch(`${API_URL}/cars/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete car')
+      }
+
+      await fetchCars()
+    } catch (e: any) {
+      error.value = e.message
+      throw e
+    } finally {
+      isLoading.value = false
+    }
   }
 })

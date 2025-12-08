@@ -140,6 +140,91 @@ func CreateCar(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": carID, "message": "Car created successfully"})
 }
 
+func UpdateCar(c *gin.Context) {
+	carID := c.Param("id")
+	var req CreateCarRequest // Reuse create request structure
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	tenantCtx, exists := c.Get("tenant")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Tenant context missing"})
+		return
+	}
+	tenant := tenantCtx.(*models.Tenant)
+
+	db, err := database.GetTenantDB(tenant.DBName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to tenant DB"})
+		return
+	}
+
+	// Update query
+	query := `
+		UPDATE cars 
+		SET make = $1, model = $2, year = $3, license_plate = $4, price_per_day = $5, currency = $6, image_url = $7, images = $8
+		WHERE id = $9
+	`
+	// Ensure main image logic
+	if req.ImageURL == "" && len(req.Images) > 0 {
+		req.ImageURL = req.Images[0]
+	}
+
+	result, err := db.Exec(context.Background(), query,
+		req.Make, req.Model, req.Year, req.LicensePlate, req.PricePerDay, req.Currency, req.ImageURL, req.Images, carID)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update car: " + err.Error()})
+		return
+	}
+
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Car not found"})
+		return
+	}
+
+	audit.LogAudit(c, "UPDATE_CAR", gin.H{"car_id": carID, "make": req.Make, "year": req.Year})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Car updated successfully"})
+}
+
+func DeleteCar(c *gin.Context) {
+	carID := c.Param("id")
+
+	tenantCtx, exists := c.Get("tenant")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Tenant context missing"})
+		return
+	}
+	tenant := tenantCtx.(*models.Tenant)
+
+	db, err := database.GetTenantDB(tenant.DBName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to tenant DB"})
+		return
+	}
+
+	// Optional: Check for existing bookings before delete to prevent orphaned records
+	// For now, we'll assume cascading or soft delete logic is preferred, or simple hard delete.
+	// User asked for "fix modif and delet", implying simple CRUD first.
+	// Let's check if it's rented first?
+	// For MVP simplicity: Hard delete. Database constraints (FK) on bookings will fail if referenced.
+
+	_, err = db.Exec(context.Background(), "DELETE FROM cars WHERE id = $1", carID)
+	if err != nil {
+		// Basic check for constraint violation
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete car (may have active bookings): " + err.Error()})
+		return
+	}
+
+	audit.LogAudit(c, "DELETE_CAR", gin.H{"car_id": carID})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Car deleted successfully"})
+}
+
 // UploadCarImage handles car image uploads
 func UploadCarImage(c *gin.Context) {
 	tenantCtx, exists := c.Get("tenant")

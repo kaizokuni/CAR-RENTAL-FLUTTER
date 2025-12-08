@@ -46,6 +46,8 @@ func main() {
 
 		protected.GET("/cars", handlers.GetCars)
 		protected.POST("/cars", handlers.CreateCar)
+		protected.PUT("/cars/:id", handlers.UpdateCar)
+		protected.DELETE("/cars/:id", handlers.DeleteCar)
 
 		protected.GET("/bookings", handlers.GetBookings)
 		protected.POST("/bookings", handlers.CreateBooking)
