@@ -191,7 +191,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
         <img 
           v-if="option.image" 
           :src="option.image" 
-          class="w-6 h-6 mr-2 object-contain" 
+          class="w-10 h-10 mr-2 bg-cover rounded-sm bg-white object-contain" 
           alt=""
           loading="lazy"
         />

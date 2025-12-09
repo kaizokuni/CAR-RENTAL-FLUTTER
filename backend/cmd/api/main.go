@@ -6,6 +6,7 @@ import (
 	"car-rental-backend/internal/middleware"
 	"car-rental-backend/internal/models"
 	"car-rental-backend/internal/seeder"
+	"log"
 	"net/http"
 	"os"
 
@@ -56,6 +57,13 @@ func main() {
 		protected.GET("/customers", handlers.GetCustomers)
 		protected.POST("/customers", handlers.CreateCustomer)
 
+		// Staff management
+		protected.GET("/staff", handlers.GetStaff)
+		protected.POST("/staff", handlers.CreateStaff)
+		protected.PUT("/staff/:id", handlers.UpdateStaff)
+		protected.DELETE("/staff/:id", handlers.DeleteStaff)
+		protected.GET("/roles", handlers.GetRoles)
+
 		protected.GET("/financials/expenses", handlers.GetExpenses)
 		protected.POST("/financials/expenses", handlers.CreateExpense)
 		protected.GET("/financials/invoices", handlers.GetInvoices)
@@ -70,9 +78,45 @@ func main() {
 
 		// Image upload
 		protected.POST("/cars/upload-image", handlers.UploadCarImage)
+
+		// Branding customization
+		protected.GET("/branding", handlers.GetBranding)
+		protected.PUT("/branding", handlers.UpdateBranding)
+		protected.POST("/branding/logo", handlers.UploadLogo)
+
+		// Landing page customization
+		protected.GET("/landing-page", handlers.GetLandingPage)
+		protected.PUT("/landing-page", handlers.UpdateLandingPage)
+
+		// Booking requests management
+		protected.GET("/booking-requests", handlers.GetBookingRequests)
+		protected.PUT("/booking-requests/:id/status", handlers.UpdateBookingRequestStatus)
 	}
 
-	// Serve uploaded files
+	// Public routes (no auth required)
+	public := r.Group("/api/v1/public")
+	{
+		public.POST("/booking-request", handlers.CreatePublicBookingRequest)
+		// Subdomain-based public routes
+		public.GET("/landing/:subdomain", handlers.GetPublicLandingBySubdomain)
+		public.GET("/cars/:subdomain", handlers.GetPublicCarsBySubdomain)
+		public.GET("/cars/:subdomain/:carId", handlers.GetPublicCarDetail)
+	}
+
+	// Site routes - admin preview (requires auth, uses tenant context)
+	site := r.Group("/api/v1/site")
+	site.Use(middleware.AuthMiddleware())
+	site.Use(middleware.TenantMiddleware())
+	{
+		site.GET("/landing", handlers.GetPublicLandingPage)
+	}
+
+	// Serve uploaded files with logging
+	uploads := r.Group("/uploads")
+	uploads.Use(func(c *gin.Context) {
+		log.Printf("[STATIC] Serving file: %s", c.Request.URL.Path)
+		c.Next()
+	})
 	r.Static("/uploads", "./uploads")
 
 	admin := r.Group("/api/v1/admin")

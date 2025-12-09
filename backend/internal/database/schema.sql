@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS cars (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID REFERENCES tenants(id),
-    make VARCHAR(100) NOT NULL,
+    brand VARCHAR(100) NOT NULL,
     model VARCHAR(100) NOT NULL,
     year INT NOT NULL,
     license_plate VARCHAR(20) UNIQUE NOT NULL,
@@ -44,6 +44,10 @@ CREATE TABLE IF NOT EXISTS cars (
     category VARCHAR(50),
     images JSONB DEFAULT '[]',
     image_url TEXT,
+    transmission VARCHAR(20),
+    fuel_type VARCHAR(30),
+    seats INTEGER DEFAULT 5,
+    description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -124,3 +128,53 @@ CREATE INDEX IF NOT EXISTS idx_bookings_customer_id ON bookings(customer_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_cars_tenant_id ON cars(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_customers_tenant_id ON customers(tenant_id);
+
+-- Branding settings for tenant customization
+CREATE TABLE IF NOT EXISTS branding (
+    tenant_id UUID PRIMARY KEY,
+    logo_url TEXT,
+    primary_color VARCHAR(7) DEFAULT '#3b82f6',
+    secondary_color VARCHAR(7) DEFAULT '#10b981',
+    accent_color VARCHAR(7),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Landing page settings for public tenant page
+CREATE TABLE IF NOT EXISTS landing_pages (
+    tenant_id UUID PRIMARY KEY,
+    hero_title TEXT,
+    hero_subtitle TEXT,
+    hero_cta_text VARCHAR(50) DEFAULT 'Browse Cars',
+    hero_background_url TEXT,
+    show_features BOOLEAN DEFAULT true,
+    show_fleet BOOLEAN DEFAULT true,
+    show_about BOOLEAN DEFAULT true,
+    about_text TEXT,
+    contact_phone VARCHAR(20),
+    contact_email VARCHAR(100),
+    contact_address TEXT,
+    social_facebook TEXT,
+    social_instagram TEXT,
+    social_twitter TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Booking requests from public landing page
+CREATE TABLE IF NOT EXISTS booking_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID,
+    car_id UUID,
+    customer_name VARCHAR(100) NOT NULL,
+    customer_phone VARCHAR(20) NOT NULL,
+    customer_email VARCHAR(100),
+    pickup_date DATE NOT NULL,
+    return_date DATE NOT NULL,
+    pickup_location TEXT,
+    delivery_requested BOOLEAN DEFAULT false,
+    message TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_booking_requests_tenant ON booking_requests(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_booking_requests_status ON booking_requests(status);

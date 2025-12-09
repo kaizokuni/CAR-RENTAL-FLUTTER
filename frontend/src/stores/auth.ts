@@ -17,6 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<any | null>(null)
   const role = ref<string | null>(null)
   const subscriptionTier = ref<string>('normal') // Default to normal
+  const tenantSubdomain = ref<string>('') // Tenant subdomain for public URL
   const isAuthenticated = computed(() => !!token.value)
   const isSuperAdmin = computed(() => role.value === 'super_admin')
   const isLoading = ref(false)
@@ -127,8 +128,13 @@ export const useAuthStore = defineStore('auth', () => {
       if (response.ok) {
         const data = await response.json()
         user.value = data.user
-        if (data.tenant && data.tenant.subscription_tier) {
-          subscriptionTier.value = data.tenant.subscription_tier
+        if (data.tenant) {
+          if (data.tenant.subscription_tier) {
+            subscriptionTier.value = data.tenant.subscription_tier
+          }
+          if (data.tenant.subdomain) {
+            tenantSubdomain.value = data.tenant.subdomain
+          }
         }
       } else {
         if (response.status === 401) {
@@ -156,6 +162,7 @@ export const useAuthStore = defineStore('auth', () => {
     subscriptionTier,
     isAuthenticated,
     isSuperAdmin,
+    tenantSubdomain,
     isLoading,
     error,
     login,

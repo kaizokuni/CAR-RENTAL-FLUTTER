@@ -5,7 +5,7 @@ import { getApiEndpoint } from '@/config/env'
 
 export interface Car {
   id: string
-  make: string
+  brand: string
   model: string
   year: number
   license_plate: string
@@ -15,6 +15,11 @@ export interface Car {
   currency?: string
   images?: string[]
   image_url?: string  // Kept for backward compatibility
+  transmission?: 'automatic' | 'manual'
+  fuel_type?: 'electric' | 'hybrid_plugin' | 'hybrid' | 'gasoline' | 'diesel'
+  seats?: number
+  description?: string
+  created_at?: string
 }
 
 export const useCarsStore = defineStore('cars', () => {

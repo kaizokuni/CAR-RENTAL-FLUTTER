@@ -234,7 +234,7 @@ const availableCars = computed(() => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem v-for="car in availableCars" :key="car.id" :value="car.id">
-                  {{ car.make }} {{ car.model }} ({{ car.year }}) - ${{ car.price_per_day }}/day
+                  {{ car.brand }} {{ car.model }} ({{ car.year }}) - ${{ car.price_per_day }}/day
                 </SelectItem>
               </SelectContent>
             </Select>

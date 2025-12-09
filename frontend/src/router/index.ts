@@ -8,7 +8,45 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      name: 'root',
+      component: () => import('../pages/site/PublicLanding.vue'),
+      beforeEnter: (to, from, next) => {
+        const host = window.location.hostname
+        const isMainSite = host === 'localhost' || host === '127.0.0.1' || host === 'www.carrent.com'
+        if (isMainSite) {
+          next('/login')
+        } else {
+          next()
+        }
+      }
+    },
+    {
+      path: '/cars',
+      name: 'root-cars',
+      component: () => import('../pages/site/PublicCarBrowser.vue'),
+      beforeEnter: (to, from, next) => {
+        const host = window.location.hostname
+        const isMainSite = host === 'localhost' || host === '127.0.0.1' || host === 'www.carrent.com'
+        if (isMainSite) {
+          next('/login')
+        } else {
+          next()
+        }
+      }
+    },
+    {
+      path: '/cars/:carId',
+      name: 'root-car-detail',
+      component: () => import('../pages/site/PublicCarDetail.vue'),
+      beforeEnter: (to, from, next) => {
+        const host = window.location.hostname
+        const isMainSite = host === 'localhost' || host === '127.0.0.1' || host === 'www.carrent.com'
+        if (isMainSite) {
+          next('/login')
+        } else {
+          next()
+        }
+      }
     },
     {
       path: '/login',
@@ -19,6 +57,28 @@ const router = createRouter({
       path: '/signup',
       name: 'signup',
       component: Signup
+    },
+    {
+      path: '/preview/landing',
+      name: 'landing-preview',
+      component: () => import('../pages/preview/LandingPreview.vue'),
+      meta: { requiresAuth: true }
+    },
+    // Public site routes (no auth required)
+    {
+      path: '/site/:subdomain',
+      name: 'public-landing',
+      component: () => import('../pages/site/PublicLanding.vue')
+    },
+    {
+      path: '/site/:subdomain/cars',
+      name: 'public-cars',
+      component: () => import('../pages/site/PublicCarBrowser.vue')
+    },
+    {
+      path: '/site/:subdomain/cars/:carId',
+      name: 'public-car-detail',
+      component: () => import('../pages/site/PublicCarDetail.vue')
     },
     {
       path: '/dashboard',
@@ -56,9 +116,9 @@ const router = createRouter({
           component: () => import('../pages/dashboard/Staff.vue')
         },
         {
-          path: 'branding',
-          name: 'branding',
-          component: () => import('../pages/dashboard/Branding.vue')
+          path: 'marketing',
+          name: 'marketing',
+          component: () => import('../pages/dashboard/Marketing.vue')
         },
         {
           path: 'profile',

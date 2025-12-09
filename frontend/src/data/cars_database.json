@@ -1,7 +1,7 @@
 {
-  "makes": {
+  "brands": {
     "Toyota": {
-      "logo": "/assets/carMakers/logos/toyota.png",
+      "logo": "/assets/cars/brands/Toyota.svg",
       "models": {
         "Yaris": {
           "category": "compact",
@@ -58,6 +58,7 @@
       }
     },
     "Honda": {
+      "logo": "/assets/cars/brands/Honda.svg",
       "models": {
         "Jazz": {
           "category": "compact",
@@ -82,6 +83,7 @@
       }
     },
     "Ford": {
+      "logo": "/assets/cars/brands/Ford.svg",
       "models": {
         "Fiesta": {
           "category": "compact",
@@ -126,6 +128,7 @@
       }
     },
     "BMW": {
+      "logo": "/assets/cars/brands/BMW.svg",
       "models": {
         "1 Series": {
           "category": "luxury",
@@ -182,6 +185,7 @@
       }
     },
     "Mercedes-Benz": {
+      "logo": "/assets/cars/brands/MercedesBenz.svg",
       "models": {
         "A-Class": {
           "category": "luxury",
@@ -238,7 +242,7 @@
       }
     },
     "Hyundai": {
-      "logo": "/assets/carMakers/logos/hyundai.png",
+      "logo": "/assets/cars/brands/Hyundai.svg",
       "models": {
         "i10": {
           "category": "compact",
@@ -291,6 +295,7 @@
       }
     },
     "Kia": {
+      "logo": "/assets/cars/brands/KIA.svg",
       "models": {
         "Picanto": {
           "category": "compact",
@@ -339,6 +344,7 @@
       }
     },
     "Fiat": {
+      "logo": "/assets/cars/brands/Fiat.svg",
       "models": {
         "Panda": {
           "category": "compact",
@@ -379,6 +385,7 @@
       }
     },
     "Skoda": {
+      "logo": "/assets/cars/brands/Skoda.svg",
       "models": {
         "Fabia": {
           "category": "compact",
@@ -415,6 +422,7 @@
       }
     },
     "Nissan": {
+      "logo": "/assets/cars/brands/Nissan.svg",
       "models": {
         "Micra": {
           "category": "compact",
@@ -459,6 +467,7 @@
       }
     },
     "Opel": {
+      "logo": "/assets/cars/brands/Opel.svg",
       "models": {
         "Corsa": {
           "category": "compact",
@@ -499,6 +508,7 @@
       }
     },
     "Suzuki": {
+      "logo": "/assets/cars/brands/Suzuki.svg",
       "models": {
         "Celerio": {
           "category": "compact",
@@ -535,6 +545,7 @@
       }
     },
     "Mazda": {
+      "logo": "/assets/cars/brands/Mazda.svg",
       "models": {
         "Mazda2": {
           "category": "compact",
@@ -563,6 +574,7 @@
       }
     },
     "Volkswagen": {
+      "logo": "/assets/cars/brands/Volkswagen.svg",
       "models": {
         "Polo": {
           "category": "compact",
@@ -655,6 +667,7 @@
       }
     },
     "Dacia": {
+      "logo": "/assets/cars/brands/Dacia.svg",
       "models": {
         "Logan": {
           "category": "sedan",
@@ -691,6 +704,7 @@
       }
     },
     "Renault": {
+      "logo": "/assets/cars/brands/Renault.svg",
       "models": {
         "Clio": {
           "category": "compact",
@@ -751,6 +765,7 @@
       }
     },
     "Peugeot": {
+      "logo": "/assets/cars/brands/Peugeot.svg",
       "models": {
         "208": {
           "category": "compact",
@@ -807,6 +822,7 @@
       }
     },
     "Citroën": {
+      "logo": "/assets/cars/brands/Citroën.svg",
       "models": {
         "C-Elysée": {
           "category": "sedan",
@@ -855,6 +871,7 @@
       }
     },
     "Audi": {
+      "logo": "/assets/cars/brands/Audi.svg",
       "models": {
         "A1": {
           "category": "luxury",
@@ -903,6 +920,7 @@
       }
     },
     "MG": {
+      "logo": "/assets/cars/brands/MG.svg",
       "models": {
         "ZS": {
           "category": "suv",
@@ -923,6 +941,7 @@
       }
     },
     "BYD": {
+      "logo": "/assets/cars/brands/BYD.svg",
       "models": {
         "Atto 3": {
           "category": "suv",
@@ -943,6 +962,7 @@
       }
     },
     "Jeep": {
+      "logo": "/assets/cars/brands/Jeep.svg",
       "models": {
         "Renegade": {
           "category": "suv",
@@ -971,6 +991,7 @@
       }
     },
     "Land Rover": {
+      "logo": "/assets/cars/brands/LandRover.svg",
       "models": {
         "Range Rover Evoque": {
           "category": "luxury-suv",
@@ -1003,6 +1024,7 @@
       }
     },
     "Volvo": {
+      "logo": "/assets/cars/brands/Volvo.svg",
       "models": {
         "XC40": {
           "category": "luxury-suv",
@@ -1027,6 +1049,7 @@
       }
     },
     "Alfa Romeo": {
+      "logo": "/assets/cars/brands/AlfaRomeo.svg",
       "models": {
         "Giulietta": {
           "category": "luxury",
@@ -1047,6 +1070,7 @@
       }
     },
     "Chery": {
+      "logo": "/assets/cars/brands/Chery.svg",
       "models": {
         "Tiggo 2": {
           "category": "suv",
@@ -1071,6 +1095,7 @@
       }
     },
     "DS": {
+      "logo": "/assets/cars/brands/DS.svg",
       "models": {
         "DS 3": {
           "category": "luxury",
@@ -1087,6 +1112,7 @@
       }
     },
     "Chevrolet": {
+      "logo": "/assets/cars/brands/Chevrolet.svg",
       "models": {
         "Spark": {
           "category": "compact",

@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Car as CarIcon, Search, Filter, ChevronRight, ChevronLeft, CheckCircle2, MoreVertical, Pencil, Trash2, AlertTriangle, X as LucideX, Eye } from 'lucide-vue-next'
+import { Plus, Car as CarIcon, Search, Filter, ChevronRight, ChevronLeft, CheckCircle2, MoreVertical, Pencil, Trash2, AlertTriangle, X as LucideX, Eye, CheckCircle, Wrench, Ban, Settings, Zap, Droplet, Users, FileText, Plug, Leaf, Fuel, Gauge, Minus, Construction } from 'lucide-vue-next'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { toast } from 'vue-sonner'
 import {
   Dialog,
@@ -42,6 +43,94 @@ const editingCarId = ref<string | null>(null)
 const carToDelete = ref<Car | null>(null)
 const viewingCar = ref<Car | null>(null)
 
+// Search & Filter State
+const searchQuery = ref('')
+const statusFilter = ref<'all' | 'available' | 'rented' | 'maintenance'>('all')
+const showFilters = ref(false)
+const brandFilter = ref<string>('')
+const yearFilter = ref<string>('')
+const fuelFilter = ref<string>('')
+const seatsFilter = ref<string>('')
+
+// Filter Options (computed from cars)
+const filterOptions = computed(() => {
+  const brands = [...new Set(carsStore.cars.map(c => c.brand))].sort()
+  const years = [...new Set(carsStore.cars.map(c => c.year))].sort().reverse()
+  const fuels = [...new Set(carsStore.cars.map(c => c.fuel_type).filter(Boolean))]
+  const seats = [...new Set(carsStore.cars.map(c => c.seats).filter(Boolean))].sort((a, b) => (a || 0) - (b || 0))
+  return { brands, years, fuels, seats }
+})
+
+// Active filters count
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (brandFilter.value) count++
+  if (yearFilter.value) count++
+  if (fuelFilter.value) count++
+  if (seatsFilter.value) count++
+  return count
+})
+
+// Clear all filters
+const clearAllFilters = () => {
+  searchQuery.value = ''
+  statusFilter.value = 'all'
+  brandFilter.value = ''
+  yearFilter.value = ''
+  fuelFilter.value = ''
+  seatsFilter.value = ''
+}
+
+// Fleet Stats
+const fleetStats = computed(() => ({
+  total: carsStore.cars.length,
+  available: carsStore.cars.filter(c => c.status === 'available').length,
+  rented: carsStore.cars.filter(c => c.status === 'rented').length,
+  maintenance: carsStore.cars.filter(c => c.status === 'maintenance').length
+}))
+
+// Filtered Cars
+const filteredCars = computed(() => {
+  let cars = carsStore.cars
+  
+  // Filter by status
+  if (statusFilter.value !== 'all') {
+    cars = cars.filter(c => c.status === statusFilter.value)
+  }
+  
+  // Filter by search query
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
+    cars = cars.filter(c => 
+      c.brand.toLowerCase().includes(query) ||
+      c.model.toLowerCase().includes(query) ||
+      c.license_plate.toLowerCase().includes(query)
+    )
+  }
+  
+  // Filter by brand
+  if (brandFilter.value) {
+    cars = cars.filter(c => c.brand === brandFilter.value)
+  }
+  
+  // Filter by year
+  if (yearFilter.value) {
+    cars = cars.filter(c => c.year === parseInt(yearFilter.value))
+  }
+  
+  // Filter by fuel type
+  if (fuelFilter.value) {
+    cars = cars.filter(c => c.fuel_type === fuelFilter.value)
+  }
+  
+  // Filter by seats
+  if (seatsFilter.value) {
+    cars = cars.filter(c => c.seats === parseInt(seatsFilter.value))
+  }
+  
+  return cars
+})
+
 // Car Database State
 // const carDatabase = ref<any>(null) // Removed duplicate
 // const isLoadingDb = ref(false) // Removed duplicate
@@ -49,40 +138,56 @@ const viewingCar = ref<Car | null>(null)
 // Wizard State
 const currentStep = ref(1)
 const steps = [
-  { id: 1, title: 'Vehicle' },
-  { id: 2, title: 'Identity' },
-  { id: 3, title: 'Gallery' },
-  { id: 4, title: 'Pricing' }
+  { id: 1, title: 'Vehicle Info', description: 'Basic details' },
+  { id: 2, title: 'Plate Number', description: 'License and region' },
+  { id: 3, title: 'Gallery', description: 'Photos' },
+  { id: 4, title: 'Details', description: 'Specs' },
+  { id: 5, title: 'Pricing', description: 'Rates' }
 ]
-
 const newCar = reactive({
-  make: '',
+  brand: '',
   model: '',
   year: new Date().getFullYear(),
   license_plate: '',
   price_per_day: 0,
   currency: 'MAD',
-  images: [] as string[]
+  images: [] as string[],
+  transmission: undefined as 'automatic' | 'manual' | undefined,
+  fuel_type: undefined as 'electric' | 'hybrid_plugin' | 'hybrid' | 'gasoline' | 'diesel' | undefined,
+  seats: 5,
+  description: ''
 })
+
+// Validation for Steps
+const transmissionOptions = [
+  { value: 'automatic', label: 'Automatic', icon: Gauge },
+  { value: 'manual', label: 'Manual', icon: Construction }
+]
+
+const fuelOptions = [
+  { value: 'electric', label: 'Electric', icon: Zap },
+  { value: 'hybrid_plugin', label: 'Plug-in', icon: Plug },
+  { value: 'hybrid', label: 'Hybrid', icon: Leaf },
+  { value: 'gasoline', label: 'Gasoline', icon: Fuel },
+  { value: 'diesel', label: 'Diesel', icon: Droplet }
+]
 
 // Validation for Steps
 const isStepValid = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return !!newCar.make && !!newCar.model && !!newCar.year
+      return !!newCar.brand && !!newCar.model && !!newCar.year
     case 2:
       // While optional, if length > 0 it should be somewhat valid. 
-      // But typically step 2 blocks if empty? 
-      // User said "plate is optional input". So always true unless explicit error?
-      // Let's enforce basic length if provided, but allow empty steps? 
-      // User also said "If I choose to input it...".
-      // Let's valid it always to true for now to respect optionality, 
-      // or check min length ONLY if not empty.
       return newCar.license_plate.length === 0 || newCar.license_plate.length >= 5
     case 3:
       // Gallery is optional
       return true
     case 4:
+      // Details - all optional
+      return true
+    case 5:
+      // Pricing
       return newCar.price_per_day > 0
     default:
       return false
@@ -103,10 +208,21 @@ const prevStep = () => {
 
 // Reset Form
 const resetForm = () => {
+  newCar.brand = ''
+  newCar.model = ''
+  newCar.year = new Date().getFullYear()
+  newCar.license_plate = ''
+  newCar.price_per_day = 0
+  newCar.currency = 'MAD'
+  newCar.images = []
+  newCar.transmission = undefined
+  newCar.fuel_type = undefined
+  newCar.seats = 5
+  newCar.description = ''
   currentStep.value = 1
   editingCarId.value = null
   Object.assign(newCar, {
-    make: '',
+    brand: '',
     model: '',
     year: new Date().getFullYear(),
     license_plate: '',
@@ -116,15 +232,15 @@ const resetForm = () => {
   })
 }
 
-// Top Makers - Dynamic from Database or Fallback
-// We will use computed to get top makers if available in DB
-const topMakers = computed(() => {
-  // Static list of top makers we want to show
-  const priority = ['Dacia', 'Renault', 'Peugeot', 'Volkswagen', 'Hyundai', 'Mercedes-Benz', 'Toyota', 'Fiat']
-  if (!carDatabase.value?.makes) return []
+// Top Brands - Dynamic from Database or Fallback
+// We will use computed to get top brands if available in DB
+const topBrands = computed(() => {
+  // Static list of top brands we want to show
+  const priority = ['Dacia', 'Renault', 'Peugeot', 'Volkswagen', 'Hyundai', 'Mercedes-Benz', 'Toyota']
+  if (!carDatabase.value?.brands) return []
   
   return priority.map(name => {
-    const data = carDatabase.value.makes[name]
+    const data = carDatabase.value.brands[name]
     return {
        name,
        logo: data?.logo || undefined
@@ -132,9 +248,9 @@ const topMakers = computed(() => {
   }).filter(m => !!m.name)
 })
 
-const selectTopMaker = (maker: string) => {
-  newCar.make = maker
-  // Clear model when switching make
+const selectTopBrand = (maker: string) => {
+  newCar.brand = maker
+  // Clear model when switching brand
   newCar.model = '' 
 }
 
@@ -145,10 +261,6 @@ import carDatabaseRaw from '@/data/cars_database.json'
 // Car Database State
 const carDatabase = ref<any>(carDatabaseRaw) // Initialize directly
 // const isLoadingDb = ref(false) // No longer needed
-
-// ...
-
-/* Removed loadCarDatabase function and its call in onMounted */
 
 onMounted(async () => {
   await carsStore.fetchCars()
@@ -186,13 +298,17 @@ const handleCreateOrUpdateCar = async () => {
 const openEditDialog = (car: Car) => {
   editingCarId.value = car.id
   Object.assign(newCar, {
-    make: car.make,
+    brand: car.brand,
     model: car.model,
     year: car.year,
     license_plate: car.license_plate,
     price_per_day: car.price_per_day,
     currency: car.currency || 'MAD',
-    images: car.images || (car.image_url ? [car.image_url] : [])
+    images: car.images || (car.image_url ? [car.image_url] : []),
+    transmission: car.transmission,
+    fuel_type: car.fuel_type,
+    seats: car.seats || 5,
+    description: car.description || ''
   })
   currentStep.value = 1
   showAddDialog.value = true
@@ -219,6 +335,33 @@ const handleDeleteCar = async () => {
   }
 }
 
+const updateCarStatus = async (newStatus: 'available' | 'rented' | 'maintenance') => {
+  if (!viewingCar.value) return
+  
+  const carId = viewingCar.value.id
+  const previousStatus = viewingCar.value.status
+  
+  // Optimistic update
+  viewingCar.value.status = newStatus
+  
+  try {
+    // Now we can send just the status field - backend supports partial updates!
+    await carsStore.updateCar(carId, { status: newStatus })
+    
+    // Re-sync viewingCar with the refreshed store data
+    const refreshedCar = carsStore.cars.find(c => c.id === carId)
+    if (refreshedCar) {
+      viewingCar.value = refreshedCar
+    }
+    
+    toast.success(`Status updated to ${newStatus}`)
+  } catch (e: any) {
+    // Revert on error
+    viewingCar.value.status = previousStatus
+    toast.error('Failed to update status', { description: e.message })
+  }
+}
+
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'available': return 'bg-green-100 text-green-800'
@@ -230,23 +373,23 @@ const getStatusColor = (status: string) => {
 
 // Helper to get logo URL
 const getLogoUrl = (make: string) => {
-  if (!make || !carDatabase.value?.makes) return undefined
-  return carDatabase.value.makes[make]?.logo
+  if (!make || !carDatabase.value?.brands) return undefined
+  return carDatabase.value.brands[make]?.logo
 }
 
 // Computed options for Autocomplete
 const makeOptions = computed(() => {
-  if (!carDatabase.value?.makes) return []
-  return Object.keys(carDatabase.value.makes).map(make => ({
+  if (!carDatabase.value?.brands) return []
+  return Object.keys(carDatabase.value.brands).map(make => ({
     value: make,
     label: make,
-    image: carDatabase.value.makes[make].logo
+    image: carDatabase.value.brands[make].logo
   }))
 })
 
 const modelOptions = computed(() => {
-  if (!carDatabase.value?.makes || !newCar.make) return []
-  const makeData = carDatabase.value.makes[newCar.make]
+  if (!carDatabase.value?.brands || !newCar.brand) return []
+  const makeData = carDatabase.value.brands[newCar.brand]
   if (!makeData?.models) return []
   
   return Object.keys(makeData.models).map(model => ({
@@ -256,28 +399,28 @@ const modelOptions = computed(() => {
 })
 
 // Watchers
-watch(() => newCar.make, (newMake) => {
-  if (newMake && carDatabase.value?.makes) {
-    const makeData = carDatabase.value.makes[newMake]
+watch(() => newCar.brand, (newMake) => {
+  if (newMake && carDatabase.value?.brands) {
+    const makeData = carDatabase.value.brands[newMake]
     if (!makeData) {
-       // Custom make
+       // Custom brand
     } else if (newCar.model && !makeData.models[newCar.model] && !editingCarId.value) {
       // Only clear model if NOT editing (to preserve loaded value)
-      // Actually, editingCarId check might not be enough if user changes make manually during edit.
-      // Better: Check if current model belongs to new make. 
+      // Actually, editingCarId check might not be enough if user changes brand manually during edit.
+      // Better: Check if current model belongs to new brand. 
       // BUT for simplicity, if we are editing and just opened, we want to keep it.
-      // If user changes make, model SHOULD reset. 
+      // If user changes brand, model SHOULD reset. 
       // The issue is initialization... watch triggers on mounting/assigning.
       
       // Fix: Check if newMake is DIFFERENT from what we had before? 
-      // Or simply: if valid model exists for make, keep it?
+      // Or simply: if valid model exists for brand, keep it?
     }
   }
 })
 
 watch(() => newCar.model, (newModel) => {
-  if (!newModel || !newCar.make || !carDatabase.value) return
-  const makeData = carDatabase.value.makes[newCar.make]
+  if (!newModel || !newCar.brand || !carDatabase.value) return
+  const makeData = carDatabase.value.brands[newCar.brand]
   const modelData = makeData?.models?.[newModel]
   
   // Only auto-set price if it's 0 (new car)
@@ -289,10 +432,11 @@ watch(() => newCar.model, (newModel) => {
 
 <template>
   <div class="p-6 space-y-6">
+    <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight">Fleet Management</h1>
-        <p class="text-muted-foreground">Manage your vehicles and their availability.</p>
+        <h1 class="text-3xl font-bold tracking-tight">Your Fleet</h1>
+        <p class="text-muted-foreground">Manage your vehicles, track availability, and keep your fleet organized.</p>
       </div>
       <Button @click="() => { resetForm(); showAddDialog = true }">
         <Plus class="mr-2 h-4 w-4" />
@@ -300,23 +444,180 @@ watch(() => newCar.model, (newModel) => {
       </Button>
     </div>
 
-    <!-- Filters & Search -->
-    <div class="flex items-center gap-4">
-      <div class="relative flex-1 max-w-sm">
-        <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search vehicles..." class="pl-8" />
+    <!-- Fleet Stats -->
+    <div class="grid gap-4 md:grid-cols-4">
+      <Card class="p-4">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-primary/10">
+            <CarIcon class="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p class="text-2xl font-bold">{{ fleetStats.total }}</p>
+            <p class="text-xs text-muted-foreground">Total Vehicles</p>
+          </div>
+        </div>
+      </Card>
+      <Card class="p-4 cursor-pointer hover:bg-accent/50 transition-colors" @click="statusFilter = 'available'">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-green-500/10">
+            <CheckCircle class="h-5 w-5 text-green-500" />
+          </div>
+          <div>
+            <p class="text-2xl font-bold">{{ fleetStats.available }}</p>
+            <p class="text-xs text-muted-foreground">Available</p>
+          </div>
+        </div>
+      </Card>
+      <Card class="p-4 cursor-pointer hover:bg-accent/50 transition-colors" @click="statusFilter = 'rented'">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-blue-500/10">
+            <Ban class="h-5 w-5 text-blue-500" />
+          </div>
+          <div>
+            <p class="text-2xl font-bold">{{ fleetStats.rented }}</p>
+            <p class="text-xs text-muted-foreground">Rented Out</p>
+          </div>
+        </div>
+      </Card>
+      <Card class="p-4 cursor-pointer hover:bg-accent/50 transition-colors" @click="statusFilter = 'maintenance'">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-orange-500/10">
+            <Wrench class="h-5 w-5 text-orange-500" />
+          </div>
+          <div>
+            <p class="text-2xl font-bold">{{ fleetStats.maintenance }}</p>
+            <p class="text-xs text-muted-foreground">In Maintenance</p>
+          </div>
+        </div>
+      </Card>
+    </div>
+
+    <!-- Search & Filter Tabs -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div class="relative flex-1 max-w-md">
+        <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input v-model="searchQuery" placeholder="Search by brand, model, or plate..." class="pl-10" />
       </div>
-      <Button variant="outline">
+      <div class="flex gap-1 p-1 bg-muted rounded-lg">
+        <Button 
+          :variant="statusFilter === 'all' ? 'default' : 'ghost'" 
+          size="sm" 
+          @click="statusFilter = 'all'"
+        >
+          All ({{ fleetStats.total }})
+        </Button>
+        <Button 
+          :variant="statusFilter === 'available' ? 'default' : 'ghost'" 
+          size="sm" 
+          @click="statusFilter = 'available'"
+          class="gap-1"
+        >
+          <CheckCircle class="h-3 w-3" /> Available
+        </Button>
+        <Button 
+          :variant="statusFilter === 'rented' ? 'default' : 'ghost'" 
+          size="sm" 
+          @click="statusFilter = 'rented'"
+          class="gap-1"
+        >
+          <Ban class="h-3 w-3" /> Rented
+        </Button>
+        <Button 
+          :variant="statusFilter === 'maintenance' ? 'default' : 'ghost'" 
+          size="sm" 
+          @click="statusFilter = 'maintenance'"
+          class="gap-1"
+        >
+          <Wrench class="h-3 w-3" /> Maintenance
+        </Button>
+      </div>
+      <Button variant="outline" @click="showFilters = !showFilters" class="relative">
         <Filter class="mr-2 h-4 w-4" />
-        Filter
+        Filters
+        <span v-if="activeFiltersCount > 0" class="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
+          {{ activeFiltersCount }}
+        </span>
       </Button>
     </div>
+
+    <!-- Advanced Filters Panel -->
+    <div v-if="showFilters" class="border rounded-lg p-4 bg-muted/20">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium">Advanced Filters</h3>
+        <Button v-if="activeFiltersCount > 0" variant="ghost" size="sm" @click="clearAllFilters">
+          Clear all
+        </Button>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Brand Filter -->
+        <div class="space-y-2">
+          <Label class="text-xs text-muted-foreground">Brand</Label>
+          <Select v-model="brandFilter">
+            <SelectTrigger>
+              <SelectValue placeholder="All brands" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All brands</SelectItem>
+              <SelectItem v-for="brand in filterOptions.brands" :key="brand" :value="brand">
+                {{ brand }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <!-- Year Filter -->
+        <div class="space-y-2">
+          <Label class="text-xs text-muted-foreground">Year</Label>
+          <Select v-model="yearFilter">
+            <SelectTrigger>
+              <SelectValue placeholder="All years" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All years</SelectItem>
+              <SelectItem v-for="year in filterOptions.years" :key="year" :value="String(year)">
+                {{ year }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <!-- Fuel Type Filter -->
+        <div class="space-y-2">
+          <Label class="text-xs text-muted-foreground">Fuel Type</Label>
+          <Select v-model="fuelFilter">
+            <SelectTrigger>
+              <SelectValue placeholder="All fuel types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All fuel types</SelectItem>
+              <SelectItem v-for="fuel in filterOptions.fuels" :key="fuel" :value="String(fuel)">
+                {{ String(fuel).replace('_', ' ') }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <!-- Seats Filter -->
+        <div class="space-y-2">
+          <Label class="text-xs text-muted-foreground">Seats</Label>
+          <Select v-model="seatsFilter">
+            <SelectTrigger>
+              <SelectValue placeholder="All seats" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All seats</SelectItem>
+              <SelectItem v-for="seats in filterOptions.seats" :key="seats" :value="String(seats)">
+                {{ seats }} seats
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
     
-    <!-- Loading/Empty/List States (Existing Code) -->
+    <!-- Loading State -->
     <div v-if="carsStore.isLoading" class="text-center py-12">
       Loading fleet...
     </div>
 
+    <!-- Empty State -->
     <div v-else-if="!carsStore.cars.length" class="border rounded-lg p-12 text-center bg-muted/10">
       <div class="flex justify-center mb-4">
         <div class="p-4 rounded-full bg-background border">
@@ -328,14 +629,27 @@ watch(() => newCar.model, (newModel) => {
       <Button @click="() => { resetForm(); showAddDialog = true }">Add Vehicle</Button>
     </div>
 
+    <!-- No Results from Filter -->
+    <div v-else-if="!filteredCars.length" class="border rounded-lg p-12 text-center bg-muted/10">
+      <div class="flex justify-center mb-4">
+        <div class="p-4 rounded-full bg-background border">
+          <Search class="h-8 w-8 text-muted-foreground" />
+        </div>
+      </div>
+      <h3 class="text-lg font-medium">No matching vehicles</h3>
+      <p class="text-muted-foreground mt-2 mb-6">Try adjusting your search or filter criteria.</p>
+      <Button variant="outline" @click="searchQuery = ''; statusFilter = 'all'">Clear Filters</Button>
+    </div>
+
+    <!-- Car Grid -->
     <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <Card v-for="car in carsStore.cars" :key="car.id" class="overflow-hidden group hover:shadow-lg transition-shadow relative">
+      <Card v-for="car in filteredCars" :key="car.id" class="overflow-hidden group hover:shadow-lg transition-shadow relative cursor-pointer" @click="viewingCar = car">
         <div class="aspect-video bg-muted relative group">
           <!-- Show ArrayImages[0] or fallback -->
           <img 
             v-if="car.image_url" 
             :src="car.image_url" 
-            :alt="`${car.make} ${car.model}`"
+            :alt="`${car.brand} ${car.model}`"
             class="w-full h-full object-cover"
           />
           <div v-else class="w-full h-full flex items-center justify-center bg-secondary">
@@ -344,15 +658,15 @@ watch(() => newCar.model, (newModel) => {
           
           <div class="absolute top-2 right-2 flex gap-2">
              <span 
-              class="px-2 py-1 rounded-full text-xs font-medium uppercase shadow-sm"
-              :class="getStatusColor(car.status)"
-            >
-              {{ car.status }}
-            </span>
+               class="px-2 py-1 rounded-full text-xs font-medium uppercase shadow-sm"
+               :class="getStatusColor(car.status)"
+             >
+               {{ car.status }}
+             </span>
           </div>
 
           <!-- Actions Dropdown -->
-          <div class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <div class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10" @click.stop>
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
                 <Button variant="secondary" size="icon" class="h-8 w-8 rounded-full shadow-lg bg-background/90 backdrop-blur-sm">
@@ -379,7 +693,7 @@ watch(() => newCar.model, (newModel) => {
         <CardHeader class="p-4 pb-2">
           <div class="flex justify-between items-start">
             <div>
-              <CardTitle class="text-lg">{{ car.make }} {{ car.model }}</CardTitle>
+              <CardTitle class="text-lg">{{ car.brand }} {{ car.model }}</CardTitle>
               <CardDescription>{{ car.year }} • {{ car.license_plate }}</CardDescription>
             </div>
           </div>
@@ -419,32 +733,32 @@ watch(() => newCar.model, (newModel) => {
              <!-- Popular Makers Grid -->
              <div>
                <Label class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 block">Quick Select Brand</Label>
-               <div class="flex flex-wrap gap-3">
+               <div class="flex gap-2 overflow-x-auto pb-2">
                  <button 
-                  v-for="maker in topMakers" 
-                  :key="maker.name"
+                  v-for="brand in topBrands" 
+                  :key="brand.name"
                   type="button"
-                  @click="selectTopMaker(maker.name)"
-                  class="flex flex-col items-center justify-center w-20 h-20 rounded-xl border-2 transition-all hover:scale-105"
-                  :class="newCar.make === maker.name ? 'border-primary bg-primary/5' : 'border-muted bg-background hover:border-primary/50'"
+                  @click="selectTopBrand(brand.name)"
+                  class="flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-xl border-2 transition-all hover:scale-105 bg-white text-gray-900"
+                  :class="newCar.brand === brand.name ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200 hover:border-primary/50'"
                  >
-                   <img v-if="maker.logo" :src="maker.logo" class="w-8 h-8 object-contain mb-2" :alt="maker.name">
-                   <div v-else class="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold mb-2">
-                     {{ maker.name.substring(0, 1) }}
+                   <img v-if="brand.logo" :src="brand.logo" class="w-7 h-7 object-contain mb-1" :alt="brand.name">
+                   <div v-else class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold mb-1">
+                     {{ brand.name.substring(0, 1) }}
                    </div>
-                   <span class="text-[10px] font-bold text-center truncate w-full px-1">{{ maker.name }}</span>
+                   <span class="text-[9px] font-semibold text-center truncate w-full px-1 text-gray-700">{{ brand.name }}</span>
                  </button>
                </div>
             </div>
 
             <div class="space-y-4">
-               <!-- Make -->
+               <!-- Brand -->
                <div class="space-y-2">
-                  <Label>Make <span class="text-destructive">*</span></Label>
+                  <Label>Brand <span class="text-destructive">*</span></Label>
                   <Autocomplete
-                    v-model="newCar.make"
+                    v-model="newCar.brand"
                     :options="makeOptions"
-                    placeholder="Search or Select Make..."
+                    placeholder="Search or Select Brand..."
                     class="w-full"
                   />
                </div>
@@ -456,7 +770,7 @@ watch(() => newCar.model, (newModel) => {
                     v-model="newCar.model"
                     :options="modelOptions"
                     placeholder="Search or Select Model..."
-                    :disabled="!newCar.make"
+                    :disabled="!newCar.brand"
                     class="w-full"
                   />
                </div>
@@ -484,7 +798,7 @@ watch(() => newCar.model, (newModel) => {
                     <CarIcon class="h-6 w-6" />
                  </div>
                  <div>
-                   <h4 class="font-medium text-blue-900 dark:text-blue-100">{{ newCar.make }} {{ newCar.model }}</h4>
+                   <h4 class="font-medium text-blue-900 dark:text-blue-100">{{ newCar.brand }} {{ newCar.model }}</h4>
                    <p class="text-sm text-blue-700 dark:text-blue-300">{{ newCar.year }} Model</p>
                  </div>
             </div>
@@ -506,9 +820,91 @@ watch(() => newCar.model, (newModel) => {
              </div>
           </div>
 
-          <!-- Step 4: Pricing -->
+          <!-- Step 4: Additional Details -->
           <div v-else-if="currentStep === 4" class="space-y-6">
-             <div class="space-y-4">
+            <div class="space-y-6 h-full p-1">
+              
+              <!-- Transmission -->
+              <div class="space-y-3">
+                 <Label class="text-base font-semibold">Transmission</Label>
+                 <RadioGroup v-model="newCar.transmission" class="grid grid-cols-2 gap-4">
+                   <Label
+                     v-for="item in transmissionOptions"
+                     :key="item.value"
+                     :for="item.value"
+                     class="relative flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 px-4 py-4 text-center shadow-sm hover:bg-accent/50 transition-all duration-200"
+                     :class="newCar.transmission === item.value ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-muted bg-transparent'"
+                   >
+                      <RadioGroupItem :id="item.value" :value="item.value" class="sr-only" />
+                      <component :is="item.icon" class="h-8 w-8" :class="newCar.transmission === item.value ? 'text-primary' : 'text-muted-foreground'" />
+                      <span class="text-sm font-medium" :class="newCar.transmission === item.value ? 'text-foreground' : 'text-muted-foreground'">{{ item.label }}</span>
+                   </Label>
+                 </RadioGroup>
+              </div>
+
+              <!-- Fuel Type -->
+              <div class="space-y-3">
+                 <Label class="text-base font-semibold">Fuel Type</Label>
+                 <RadioGroup v-model="newCar.fuel_type" class="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                   <Label
+                     v-for="item in fuelOptions"
+                     :key="item.value"
+                     :for="item.value"
+                     class="relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 px-2 py-3 text-center shadow-sm hover:bg-accent/50 transition-all duration-200"
+                     :class="newCar.fuel_type === item.value ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-muted bg-transparent'"
+                   >
+                      <RadioGroupItem :id="item.value" :value="item.value" class="sr-only" />
+                      <component :is="item.icon" class="h-6 w-6" :class="newCar.fuel_type === item.value ? 'text-primary' : 'text-muted-foreground'" />
+                      <span class="text-xs font-medium leading-tight" :class="newCar.fuel_type === item.value ? 'text-foreground' : 'text-muted-foreground'">{{ item.label }}</span>
+                   </Label>
+                 </RadioGroup>
+              </div>
+
+              <!-- Seats & Description -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <!-- Seats -->
+                 <div class="space-y-3">
+                    <Label class="text-base font-semibold">Seats</Label>
+                    <div class="flex items-center gap-4 bg-muted/20 p-2 rounded-xl border w-fit">
+                       <Button 
+                         variant="outline" 
+                         size="icon" 
+                         class="h-10 w-10 rounded-lg hover:bg-background hover:text-foreground"
+                         @click="newCar.seats > 2 ? newCar.seats-- : null" 
+                         :disabled="newCar.seats <= 2"
+                       >
+                         <Minus class="h-5 w-5" />
+                       </Button>
+                       <div class="text-2xl font-bold w-12 text-center tabular-nums">{{ newCar.seats }}</div>
+                       <Button 
+                         variant="outline" 
+                         size="icon" 
+                         class="h-10 w-10 rounded-lg hover:bg-background hover:text-foreground"
+                         @click="newCar.seats < 15 ? newCar.seats++ : null" 
+                         :disabled="newCar.seats >= 15"
+                       >
+                         <Plus class="h-5 w-5" />
+                       </Button>
+                    </div>
+                 </div>
+
+                 <!-- Description -->
+                 <div class="space-y-3">
+                    <Label for="description" class="text-base font-semibold">Description</Label>
+                    <textarea 
+                      id="description" 
+                      v-model="newCar.description" 
+                      class="flex min-h-[100px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      placeholder="Add specific details..."
+                    ></textarea>
+                 </div>
+              </div>
+            </div>
+          </div>
+           
+           <!-- Step 5: Pricing -->
+           <div v-else-if="currentStep === 5" class="space-y-6">
+              <div class="space-y-4">
                 <Label class="text-base">Set Daily Rate</Label>
                 
                 <div class="flex items-center gap-4">
@@ -548,7 +944,7 @@ watch(() => newCar.model, (newModel) => {
                     
                     <div class="space-y-1">
                        <span class="text-xs text-muted-foreground">Vehicle</span>
-                       <div class="font-medium">{{ newCar.make }} {{ newCar.model }}</div>
+                       <div class="font-medium">{{ newCar.brand }} {{ newCar.model }}</div>
                        <div class="text-xs">{{ newCar.year }}</div>
                     </div>
 
@@ -569,6 +965,8 @@ watch(() => newCar.model, (newModel) => {
                  </div>
              </div>
           </div>
+
+
         </div>
 
         <DialogFooter class="px-6 py-4 border-t bg-muted/10 flex items-center justify-between w-full">
@@ -592,7 +990,7 @@ watch(() => newCar.model, (newModel) => {
              </Button>
 
              <Button 
-                v-if="currentStep < 4" 
+                v-if="currentStep < 5" 
                 @click="nextStep" 
                 :disabled="!isStepValid"
              >
@@ -638,7 +1036,7 @@ watch(() => newCar.model, (newModel) => {
             <DialogTitle class="text-xl text-red-600">Delete Vehicle</DialogTitle>
           </div>
           <DialogDescription>
-            Are you sure you want to delete <strong>{{ carToDelete?.make }} {{ carToDelete?.model }}</strong>?
+            Are you sure you want to delete <strong>{{ carToDelete?.brand }} {{ carToDelete?.model }}</strong>?
             <br/><br/>
             This action cannot be undone. If this vehicle has active bookings, you might need to resolve them first.
           </DialogDescription>
@@ -666,7 +1064,7 @@ watch(() => newCar.model, (newModel) => {
          <!-- Header -->
         <div class="flex items-start justify-between">
            <div>
-              <h2 class="text-2xl font-bold">{{ viewingCar.make }} {{ viewingCar.model }}</h2>
+              <h2 class="text-2xl font-bold">{{ viewingCar.brand }} {{ viewingCar.model }}</h2>
               <p class="text-muted-foreground">{{ viewingCar.year }} • {{ viewingCar.license_plate }}</p>
            </div>
            <Button variant="ghost" size="icon" @click="viewingCar = null">
@@ -685,10 +1083,39 @@ watch(() => newCar.model, (newModel) => {
            <div v-else class="flex h-full w-full items-center justify-center">
              <CarIcon class="h-12 w-12 text-muted-foreground/30" />
            </div>
-           <div class="absolute top-3 right-3">
-             <span class="rounded-full bg-background/80 px-3 py-1 text-sm font-semibold backdrop-blur-sm shadow-sm" :class="getStatusColor(viewingCar.status)">
-               {{ viewingCar.status }}
-             </span>
+        </div>
+
+        <!-- Status Update Section -->
+        <div class="space-y-2 border-t pt-4">
+           <Label class="text-sm font-semibold">Vehicle Status</Label>
+           <div class="flex gap-2">
+             <Button 
+               @click="updateCarStatus('available')" 
+               :variant="viewingCar.status === 'available' ? 'default' : 'outline'" 
+               size="sm" 
+               class="flex-1"
+             >
+               <CheckCircle class="mr-2 h-4 w-4" />
+               Available
+             </Button>
+             <Button 
+               @click="updateCarStatus('rented')" 
+               :variant="viewingCar.status === 'rented' ? 'default' : 'outline'" 
+               size="sm" 
+               class="flex-1"
+             >
+               <Ban class="mr-2 h-4 w-4" />
+               Rented
+             </Button>
+             <Button 
+               @click="updateCarStatus('maintenance')" 
+               :variant="viewingCar.status === 'maintenance' ? 'default' : 'outline'" 
+               size="sm" 
+               class="flex-1"
+             >
+               <Wrench class="mr-2 h-4 w-4" />
+               Maintenance
+             </Button>
            </div>
         </div>
 
@@ -717,16 +1144,45 @@ watch(() => newCar.model, (newModel) => {
               <span class="text-xs text-muted-foreground uppercase">License Plate</span>
               <div class="font-medium font-mono bg-muted px-2 py-0.5 rounded inline-block text-sm">{{ viewingCar.license_plate }}</div>
            </div>
+           <div v-if="viewingCar.transmission" class="space-y-1">
+              <span class="text-xs text-muted-foreground uppercase flex items-center gap-1">
+                <Settings class="h-3 w-3" />
+                Transmission
+              </span>
+              <div class="text-sm font-medium capitalize">{{ viewingCar.transmission }}</div>
+           </div>
+           <div v-if="viewingCar.fuel_type" class="space-y-1">
+              <span class="text-xs text-muted-foreground uppercase flex items-center gap-1">
+                <Zap v-if="viewingCar.fuel_type === 'electric' || viewingCar.fuel_type.includes('hybrid')" class="h-3 w-3" />
+                <Droplet v-else class="h-3 w-3" />
+                Fuel Type
+              </span>
+              <div class="text-sm font-medium capitalize">{{ viewingCar.fuel_type.replace('_', ' ') }}</div>
+           </div>
+           <div v-if="viewingCar.seats" class="space-y-1">
+              <span class="text-xs text-muted-foreground uppercase flex items-center gap-1">
+                <Users class="h-3 w-3" />
+                Seats
+              </span>
+              <div class="text-sm font-medium">{{ viewingCar.seats }} Seats</div>
+           </div>
            <div class="space-y-1">
               <span class="text-xs text-muted-foreground uppercase">Created At</span>
-              <!-- <div class="text-sm">...</div> -->
-              <!-- We don't have created_at in frontend model, omitting for now -->
-              <div class="text-sm font-medium">-</div>
+              <div class="text-sm font-medium">{{ viewingCar.created_at ? new Date(viewingCar.created_at).toLocaleDateString() : '-' }}</div>
            </div>
         </div>
+        
+        <!-- Description -->
+        <div v-if="viewingCar.description" class="space-y-2 border-t pt-4">
+          <span class="text-xs text-muted-foreground uppercase flex items-center gap-1">
+            <FileText class="h-3 w-3" />
+            Description
+          </span>
+          <p class="text-sm text-foreground/80">{{ viewingCar.description }}</p>
+        </div>
 
+        
         <div class="flex-1"></div>
-
         <!-- Footer Actions -->
         <div class="flex gap-2 border-t pt-4">
            <Button class="flex-1" @click="() => { openEditDialog(viewingCar!); viewingCar = null; }">

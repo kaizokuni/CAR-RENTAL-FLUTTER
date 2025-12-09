@@ -10,6 +10,7 @@ import {
   UserCog,
   DollarSign,
   Palette,
+  Globe,
   Settings,
   FileText
 } from 'lucide-vue-next'
@@ -99,8 +100,8 @@ export const ownerSidebar: SidebarConfig = {
     },
     {
       icon: Palette,
-      label: 'Branding',
-      path: '/dashboard/branding',
+      label: 'Marketing',
+      path: '/dashboard/marketing',
       requiresSubscription: 'premium',
       badge: 'PREMIUM'
     },

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import AppSidebar from '@/components/ui/sidebar/AppSidebar.vue'
 import {
   Breadcrumb,
@@ -16,6 +17,14 @@ import {
 } from '@/components/ui/sidebar'
 import NotificationsPopover from '@/components/NotificationsPopover.vue'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
+import { useBrandingStore } from '@/stores/branding'
+
+const brandingStore = useBrandingStore()
+
+// Load branding on dashboard mount
+onMounted(async () => {
+  await brandingStore.fetchBranding()
+})
 </script>
 
 <template>

@@ -55,10 +55,16 @@ func (i *IPRateLimiter) GetLimiter(ip string) *rate.Limiter {
 }
 
 func RateLimitMiddleware() gin.HandlerFunc {
-	// Allow 10 requests per second with a burst of 20
-	limiter := NewIPRateLimiter(10, 20)
+	// Allow 50 requests per second with a burst of 100
+	limiter := NewIPRateLimiter(50, 100)
 
 	return func(c *gin.Context) {
+		// Skip rate limiting for OPTIONS requests (CORS preflight)
+		if c.Request.Method == "OPTIONS" {
+			c.Next()
+			return
+		}
+
 		ip := c.ClientIP()
 		if !limiter.GetLimiter(ip).Allow() {
 			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Component } from "vue"
 
-import { ChevronsUpDown, Plus } from "lucide-vue-next"
-import { ref } from "vue"
+import { ChevronsUpDown, Plus, Building2 } from "lucide-vue-next"
+import { ref, watch } from "vue"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,16 +20,29 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
+interface Team {
+  name: string
+  logo?: string | null  // Image URL
+  logoIcon?: Component  // Fallback icon
+  plan: string
+}
+
 const props = defineProps<{
-  teams: {
-    name: string
-    logo: Component
-    plan: string
-  }[]
+  teams: Team[]
 }>()
 
 const { isMobile } = useSidebar()
-const activeTeam = ref(props.teams[0])
+
+// Default team
+const defaultTeam: Team = { name: 'My Organization', plan: 'Standard' }
+const activeTeam = ref<Team>(props.teams[0] || defaultTeam)
+
+// Watch for changes in teams prop
+watch(() => props.teams, (newTeams) => {
+  if (newTeams && newTeams.length > 0 && newTeams[0]) {
+    activeTeam.value = newTeams[0]
+  }
+}, { deep: true })
 </script>
 
 <template>
@@ -42,8 +55,18 @@ const activeTeam = ref(props.teams[0])
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             v-if="activeTeam"
           >
-            <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-              <component :is="activeTeam.logo" class="size-4" />
+            <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground overflow-hidden">
+              <img 
+                v-if="activeTeam.logo" 
+                :src="activeTeam.logo" 
+                :alt="activeTeam.name"
+                class="size-6 object-contain"
+              />
+              <component 
+                v-else 
+                :is="activeTeam.logoIcon || Building2" 
+                class="size-4" 
+              />
             </div>
             <div class="grid flex-1 text-left text-sm leading-tight">
               <span class="truncate font-medium">
@@ -61,7 +84,7 @@ const activeTeam = ref(props.teams[0])
           :side-offset="4"
         >
           <DropdownMenuLabel class="text-xs text-muted-foreground">
-            Teams
+            Organization
           </DropdownMenuLabel>
           <DropdownMenuItem
             v-for="(team, index) in teams"
@@ -69,20 +92,21 @@ const activeTeam = ref(props.teams[0])
             class="gap-2 p-2"
             @click="activeTeam = team"
           >
-            <div class="flex size-6 items-center justify-center rounded-sm border">
-              <component :is="team.logo" class="size-3.5 shrink-0" />
+            <div class="flex size-6 items-center justify-center rounded-sm border overflow-hidden">
+              <img 
+                v-if="team.logo" 
+                :src="team.logo" 
+                :alt="team.name"
+                class="size-4 object-contain"
+              />
+              <component 
+                v-else 
+                :is="team.logoIcon || Building2" 
+                class="size-3.5 shrink-0" 
+              />
             </div>
             {{ team.name }}
             <DropdownMenuShortcut>⌘{{ index + 1 }}</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem class="gap-2 p-2">
-            <div class="flex size-6 items-center justify-center rounded-md border bg-transparent">
-              <Plus class="size-4" />
-            </div>
-            <div class="font-medium text-muted-foreground">
-              Add team
-            </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

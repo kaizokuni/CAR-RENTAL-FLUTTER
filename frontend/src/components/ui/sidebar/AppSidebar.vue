@@ -2,6 +2,7 @@
 import type { SidebarProps } from "@/components/ui/sidebar"
 import { computed } from "vue"
 import { useAuthStore } from "@/stores/auth"
+import { useBrandingStore } from "@/stores/branding"
 import { usePermissions } from "@/composables/usePermissions"
 import { getSidebarConfig } from "@/config/sidebarConfig"
 import { Building2 } from "lucide-vue-next"
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 })
 
 const authStore = useAuthStore()
+const brandingStore = useBrandingStore()
 const { canAccess } = usePermissions()
 
 const user = computed(() => {
@@ -68,13 +70,23 @@ const filteredNavItems = computed(() => {
   })
 })
 
-const teams = [
+// Tenant branding
+const tenantName = computed(() => authStore.user?.tenant_name || 'Car Rental Co.')
+const tenantPlan = computed(() => {
+  const tier = authStore.subscriptionTier
+  if (tier === 'premium') return 'Premium'
+  if (tier === 'pro') return 'Pro'
+  return 'Standard'
+})
+
+const teams = computed(() => [
   {
-    name: "Car Rental Co.",
-    logo: Building2,
-    plan: "Enterprise",
+    name: tenantName.value,
+    logo: brandingStore.branding.logo_url || null,
+    logoIcon: Building2,
+    plan: tenantPlan.value,
   },
-]
+])
 </script>
 
 <template>

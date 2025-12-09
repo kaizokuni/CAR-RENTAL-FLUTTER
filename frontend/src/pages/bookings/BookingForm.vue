@@ -56,7 +56,7 @@ async function onSubmit() {
       <select id="car" v-model="form.car_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required>
         <option value="" disabled>Select a car</option>
         <option v-for="car in carsStore.cars" :key="car.id" :value="car.id">
-            {{ car.make }} {{ car.model }} (${{ car.price_per_day }}/day)
+            {{ car.brand }} {{ car.model }} (${{ car.price_per_day }}/day)
         </option>
       </select>
     </div>
