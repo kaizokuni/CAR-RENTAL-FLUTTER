@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -217,7 +218,7 @@ func UpdateStaff(c *gin.Context) {
 
 	args = append(args, staffID, tenantModel.ID)
 
-	query := "UPDATE users SET " + joinStrings(updates, ", ") +
+	query := "UPDATE users SET " + strings.Join(updates, ", ") +
 		fmt.Sprintf(" WHERE id = $%d AND tenant_id = $%d", argIdx, argIdx+1)
 
 	_, err = pool.Exec(context.Background(), query, args...)
@@ -313,14 +314,4 @@ func GetRoles(c *gin.Context) {
 	c.JSON(http.StatusOK, roles)
 }
 
-// Helper function to join strings
-func joinStrings(strs []string, sep string) string {
-	if len(strs) == 0 {
-		return ""
-	}
-	result := strs[0]
-	for i := 1; i < len(strs); i++ {
-		result += sep + strs[i]
-	}
-	return result
-}
+// Removed custom joinStrings - using strings.Join from standard library

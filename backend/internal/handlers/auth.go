@@ -155,7 +155,11 @@ func Login(c *gin.Context) {
 
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		secret = "default_secret_key" // Fallback for dev
+		if os.Getenv("GIN_MODE") == "release" {
+			log.Fatal("FATAL: JWT_SECRET environment variable must be set in production")
+		}
+		log.Println("WARNING: Using default JWT secret - NOT SAFE FOR PRODUCTION")
+		secret = "dev_secret_key_change_in_production"
 	}
 
 	tokenString, err := token.SignedString([]byte(secret))

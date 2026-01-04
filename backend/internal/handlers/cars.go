@@ -429,7 +429,7 @@ func UploadCarImage(c *gin.Context) {
 func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 	b := make([]byte, length)
-	rand.Seed(time.Now().UnixNano())
+	// Note: rand package auto-seeds since Go 1.20, no need for rand.Seed()
 	for i := range b {
 		b[i] = charset[rand.Intn(len(charset))]
 	}

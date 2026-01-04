@@ -94,9 +94,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     end_date DATE NOT NULL,
     price_per_day DECIMAL(10, 2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'MAD',
-    image_url TEXT, -- Keeping for backward compatibility or single cover
-    images TEXT[], -- Array of image URLs
-    status VARCHAR(20) DEFAULT 'available' CHECK (status IN ('available', 'rented', 'maintenance')),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'active', 'completed', 'cancelled')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -165,8 +163,8 @@ CREATE TABLE IF NOT EXISTS landing_pages (
 -- Booking requests from public landing page
 CREATE TABLE IF NOT EXISTS booking_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID,
-    car_id UUID,
+    tenant_id UUID REFERENCES tenants(id),
+    car_id UUID REFERENCES cars(id),
     customer_name VARCHAR(100) NOT NULL,
     customer_phone VARCHAR(20) NOT NULL,
     customer_email VARCHAR(100),

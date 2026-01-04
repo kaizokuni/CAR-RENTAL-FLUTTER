@@ -47,7 +47,7 @@ func getTenantDBFromContext(c *gin.Context) (*pgxpool.Pool, *models.Tenant, erro
 }
 
 func GetBookings(c *gin.Context) {
-	db, _, err := getTenantDBFromContext(c)
+	db, tenant, err := getTenantDBFromContext(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to tenant DB"})
 		return
@@ -63,9 +63,10 @@ func GetBookings(c *gin.Context) {
 		FROM bookings b
 		JOIN cars c ON b.car_id = c.id
 		LEFT JOIN customers cust ON b.customer_id = cust.id
+		WHERE b.tenant_id = $1
 		ORDER BY b.created_at DESC
 	`
-	rows, err := db.Query(context.Background(), query)
+	rows, err := db.Query(context.Background(), query, tenant.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch bookings: " + err.Error()})
 		return
@@ -136,7 +137,7 @@ func CreateBooking(c *gin.Context) {
 
 	var bookingID string
 	err = db.QueryRow(context.Background(),
-		"INSERT INTO bookings (tenant_id, car_id, customer_id, start_date, end_date, price_per_day, status) VALUES ($1, $2, $3, $4, $5, $6, 'available') RETURNING id",
+		"INSERT INTO bookings (tenant_id, car_id, customer_id, start_date, end_date, price_per_day, status) VALUES ($1, $2, $3, $4, $5, $6, 'pending') RETURNING id",
 		tenant.ID, req.CarID, customerID, req.StartDate, req.EndDate, pricePerDay).Scan(&bookingID)
 
 	if err != nil {

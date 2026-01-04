@@ -5,6 +5,7 @@ import (
 	"car-rental-backend/internal/models"
 	"context"
 	"fmt"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -157,7 +158,7 @@ func DeleteTenant(c *gin.Context) {
 func GetAllTenants(c *gin.Context) {
 	var tenants []models.Tenant
 	// Exclude the "admin" tenant from the list - it's for platform management only, not a real shop
-	rows, err := database.DB.Query(context.Background(), "SELECT id, name, subdomain, db_name, created_at FROM tenants WHERE subdomain != 'admin' ORDER BY created_at DESC")
+	rows, err := database.DB.Query(context.Background(), "SELECT id, name, subdomain, db_name, subscription_tier, created_at FROM tenants WHERE subdomain != 'admin' ORDER BY created_at DESC")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch tenants"})
 		return
@@ -166,7 +167,7 @@ func GetAllTenants(c *gin.Context) {
 
 	for rows.Next() {
 		var tenant models.Tenant
-		err := rows.Scan(&tenant.ID, &tenant.Name, &tenant.Subdomain, &tenant.DBName, &tenant.CreatedAt)
+		err := rows.Scan(&tenant.ID, &tenant.Name, &tenant.Subdomain, &tenant.DBName, &tenant.SubscriptionTier, &tenant.CreatedAt)
 		if err != nil {
 			continue
 		}
@@ -245,7 +246,10 @@ func ImpersonateTenant(c *gin.Context) {
 
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		secret = "default_secret_key"
+		if os.Getenv("GIN_MODE") == "release" {
+			log.Fatal("FATAL: JWT_SECRET environment variable must be set in production")
+		}
+		secret = "dev_secret_key_change_in_production"
 	}
 
 	tokenString, err := token.SignedString([]byte(secret))
