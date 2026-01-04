@@ -5,6 +5,7 @@ import (
 	"car-rental-backend/internal/models"
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -157,6 +158,7 @@ func UpdateLandingPage(c *gin.Context) {
 		req.SocialTiktok, req.IsLive, selectedCarsJSON)
 
 	if err != nil {
+		log.Printf("Error updating landing page: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update landing page"})
 		return
 	}
@@ -403,7 +405,7 @@ func GetPublicLandingPage(c *gin.Context) {
 	var cars []CarPublic
 	if len(lp.SelectedCars) > 0 {
 		rows, err := pool.Query(context.Background(),
-			`SELECT id, brand, model, year, daily_rate, COALESCE(image_url, ''), 
+			`SELECT id, brand, model, year, price_per_day, COALESCE(image_url, ''), 
 			 COALESCE(transmission, ''), COALESCE(fuel_type, ''), COALESCE(seats, 5)
 			 FROM cars WHERE id = ANY($1) AND status = 'available'`, lp.SelectedCars)
 		if err == nil {

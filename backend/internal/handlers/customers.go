@@ -47,7 +47,7 @@ func GetCustomers(c *gin.Context) {
 		return
 	}
 
-	rows, err := db.Query(context.Background(), "SELECT id, first_name, last_name, email, phone, license_number, address FROM customers ORDER BY created_at DESC")
+	rows, err := db.Query(context.Background(), "SELECT id, first_name, last_name, email, phone, address FROM customers ORDER BY created_at DESC")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch customers: " + err.Error()})
 		return
@@ -57,16 +57,16 @@ func GetCustomers(c *gin.Context) {
 	var customers []Customer
 	for rows.Next() {
 		var cust Customer
-		var phone, license, address *string
-		if err := rows.Scan(&cust.ID, &cust.FirstName, &cust.LastName, &cust.Email, &phone, &license, &address); err != nil {
+		var email, phone, address *string
+		if err := rows.Scan(&cust.ID, &cust.FirstName, &cust.LastName, &email, &phone, &address); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan customer: " + err.Error()})
 			return
 		}
+		if email != nil {
+			cust.Email = *email
+		}
 		if phone != nil {
 			cust.Phone = *phone
-		}
-		if license != nil {
-			cust.LicenseNumber = *license
 		}
 		if address != nil {
 			cust.Address = *address
@@ -96,8 +96,8 @@ func CreateCustomer(c *gin.Context) {
 
 	var customerID string
 	err = db.QueryRow(context.Background(),
-		"INSERT INTO customers (tenant_id, first_name, last_name, email, phone, license_number, address) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-		tenant.ID, req.FirstName, req.LastName, req.Email, req.Phone, req.LicenseNumber, req.Address).Scan(&customerID)
+		"INSERT INTO customers (tenant_id, first_name, last_name, email, phone, address) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+		tenant.ID, req.FirstName, req.LastName, req.Email, req.Phone, req.Address).Scan(&customerID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create customer: " + err.Error()})

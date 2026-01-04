@@ -123,12 +123,14 @@ func GetInvoices(c *gin.Context) {
 		return
 	}
 
-	// Join with bookings to get customer name if possible, but bookings table has customer_name
+	// Join with bookings and customers to get customer name
 	query := `
-		SELECT i.id, i.booking_id, i.amount, i.status, i.issued_date, i.due_date, b.customer_name
+		SELECT i.id, i.booking_id, i.amount, i.status, i.created_at, i.due_date, 
+		       COALESCE(cust.first_name || ' ' || cust.last_name, 'Unknown') as customer_name
 		FROM invoices i
 		JOIN bookings b ON i.booking_id = b.id
-		ORDER BY i.issued_date DESC
+		LEFT JOIN customers cust ON b.customer_id = cust.id
+		ORDER BY i.created_at DESC
 	`
 	rows, err := db.Query(context.Background(), query)
 	if err != nil {

@@ -1,0 +1,15 @@
+# Analysis options for Flutter
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Disable overly pedantic rules
+    prefer_const_constructors: false
+    prefer_const_declarations: false
+    
+analyzer:
+  errors:
+    deprecated_member_use: ignore
+    deprecated_member_use_from_same_package: ignore
+    unnecessary_non_null_assertion: ignore
+    unnecessary_null_comparison: ignore

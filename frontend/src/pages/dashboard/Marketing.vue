@@ -656,7 +656,7 @@ onMounted(fetchData)
               </div>
               <Button 
                 :variant="settings.is_live ? 'destructive' : 'default'"
-                @click="toggleLive"
+                @click="toggleLive(!settings.is_live)"
               >
                 {{ settings.is_live ? 'Go Offline' : 'Go Live' }}
               </Button>

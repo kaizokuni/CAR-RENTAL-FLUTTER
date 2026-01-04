@@ -153,9 +153,12 @@ CREATE TABLE IF NOT EXISTS landing_pages (
     contact_phone VARCHAR(20),
     contact_email VARCHAR(100),
     contact_address TEXT,
+    whatsapp_number VARCHAR(20),
     social_facebook TEXT,
     social_instagram TEXT,
-    social_twitter TEXT,
+    social_tiktok TEXT,
+    is_live BOOLEAN DEFAULT false,
+    selected_cars JSONB DEFAULT '[]'::jsonb,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

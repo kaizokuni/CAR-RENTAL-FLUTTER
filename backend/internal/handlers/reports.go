@@ -82,12 +82,12 @@ func GetRevenueByCar(c *gin.Context) {
 	}
 
 	query := `
-		SELECT c.id, c.make, c.model, 
-		       COALESCE(SUM(b.total_price), 0) as total_revenue,
+		SELECT c.id, c.brand, c.model, 
+		       COALESCE(SUM(b.price_per_day * ((b.end_date - b.start_date) + 1)), 0) as total_revenue,
 		       COUNT(b.id) as booking_count
 		FROM cars c
-		LEFT JOIN bookings b ON c.id = b.car_id AND b.status != 'Cancelled'
-		GROUP BY c.id, c.make, c.model
+		LEFT JOIN bookings b ON c.id = b.car_id AND b.status != 'maintenance'
+		GROUP BY c.id, c.brand, c.model
 		ORDER BY total_revenue DESC
 		LIMIT 10
 	`
